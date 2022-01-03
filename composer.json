@@ -1,0 +1,28 @@
+{
+    "name": "ekok/sql",
+    "description": "PHP SQL Utility",
+    "type": "library",
+    "require": {
+        "php": ">=8.0",
+        "ekok/php-utils": "dev-master"
+    },
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Ekok\\Sql\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "classmap": ["tests/fixtures/classes"]
+    },
+    "authors": [
+        {
+            "name": "Eko Kurniawan",
+            "email": "setiawanegho@gmail.com"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require-dev": {
+        "phpunit/phpunit": "^9.5"
+    }
+}

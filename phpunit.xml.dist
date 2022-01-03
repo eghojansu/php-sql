@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.5/phpunit.xsd"
+    backupGlobals="false"
+    backupStaticAttributes="false"
+    colors="true"
+    stderr="true"
+    convertErrorsToExceptions="true"
+    convertNoticesToExceptions="true"
+    convertWarningsToExceptions="true"
+    processIsolation="false"
+    stopOnFailure="false"
+    bootstrap="tests/bootstrap.php">
+  <testsuites>
+    <testsuite name="PHP SQL Unit Test">
+      <directory>tests/Unit</directory>
+    </testsuite>
+  </testsuites>
+  <php>
+    <ini name="error_reporting" value="-1" />
+  </php>
+  <coverage>
+    <include>
+      <directory suffix=".php">src</directory>
+    </include>
+    <report>
+      <html outputDirectory="coverage/html" />
+      <text outputFile="php://stdout" showUncoveredFiles="true" />
+    </report>
+  </coverage>
+</phpunit>
