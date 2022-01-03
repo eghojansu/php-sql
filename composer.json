@@ -1,5 +1,5 @@
 {
-    "name": "ekok/sql",
+    "name": "ekok/php-sql",
     "description": "PHP SQL Utility",
     "type": "library",
     "require": {
