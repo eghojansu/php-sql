@@ -48,15 +48,15 @@ class Mapper implements \ArrayAccess, \Iterator, \Countable, \JsonSerializable
         string|array|null $columnsIgnore = null,
     ) {
         if (!$this->table) {
-            $this->table = $table ?? Str::caseSnake(ltrim(strrchr('\\' . static::class, '\\'), '\\'));
+            $this->table = $table ?? Str::className(static::class, true);
         }
 
         if ($columnsLoad) {
-            $this->columnsLoad = array_fill_keys(Arr::ensure($columnsLoad), true);
+            $this->columnsLoad = Arr::fill($columnsLoad);
         }
 
         if ($columnsIgnore) {
-            $this->columnsIgnore = array_fill_keys(Arr::ensure($columnsIgnore), true);
+            $this->columnsIgnore = Arr::fill($columnsIgnore);
         }
 
         if ($keys) {
@@ -224,11 +224,8 @@ class Mapper implements \ArrayAccess, \Iterator, \Countable, \JsonSerializable
 
             $this->getters = Arr::each(
                 $ref->getMethods(\ReflectionMethod::IS_PUBLIC),
-                fn(Payload $method) => (
-                    str_starts_with($method->value->name, $accesor = 'get')
-                    || str_starts_with($method->value->name, $accesor = 'has')
-                    || str_starts_with($method->value->name, $accesor = 'is')
-                ) ? $method->update($method->value->name, Str::caseSnake(substr($method->value->name, strlen($accesor)))) : null,
+                fn(Payload $method) => ($accesor = Str::startsWith($method->value->name, 'get', 'has', 'is')) ?
+                    $method->update($method->value->name, Str::caseSnake(substr($method->value->name, strlen($accesor)))) : null,
                 true,
             );
         }
