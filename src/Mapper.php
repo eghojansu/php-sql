@@ -5,6 +5,7 @@ namespace Ekok\Sql;
 use Ekok\Utils\Arr;
 use Ekok\Utils\Str;
 use Ekok\Utils\Payload;
+use Ekok\Utils\Val;
 
 class Mapper implements \ArrayAccess, \Iterator, \Countable, \JsonSerializable
 {
@@ -447,14 +448,14 @@ class Mapper implements \ArrayAccess, \Iterator, \Countable, \JsonSerializable
         $cast = $this->casts[$column] ?? null;
 
         return match($cast) {
-            'arr', 'array' => array_map(Str::class . '::cast', array_filter(array_map('trim', explode(',', $var)))),
+            'arr', 'array' => array_map(Val::class . '::cast', array_filter(array_map('trim', explode(',', $var)))),
             'json' => json_decode($var, true),
             'int', 'integer' => filter_var($var, FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE),
             'float' => filter_var($var, FILTER_VALIDATE_FLOAT, FILTER_NULL_ON_FAILURE),
             'bool', 'boolean' => filter_var($var, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE),
             'str', 'string' => $var,
             'date', 'datetime' => new \DateTime($var),
-            default => null === $var ? null : Str::cast($var),
+            default => null === $var ? null : Val::cast($var),
         };
     }
 

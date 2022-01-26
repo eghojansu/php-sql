@@ -1,7 +1,5 @@
 <?php
 
-namespace Ekok\Sql\Fixture\Mapper;
-
 use Ekok\Sql\Mapper;
 use Ekok\Sql\Connection;
 

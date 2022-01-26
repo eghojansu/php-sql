@@ -1,23 +1,20 @@
 <?php
 
-namespace Ekok\Sql\Tests;
-
 use Ekok\Sql\Helper;
 use Ekok\Sql\Mapper;
 use Ekok\Sql\Builder;
 use Ekok\Sql\Connection;
-use PHPUnit\Framework\TestCase;
-use Ekok\Sql\Fixture\Mapper\UserMap;
 
-class ConnectionTest extends TestCase
+class ConnectionTest extends \Codeception\Test\Unit
 {
+    /** @var \UnitTester */
+    protected $tester;
+
     /** @var Connection */
     private $db;
 
-    public function setUp(): void
+    protected function _before()
     {
-        parent::setUp();
-
         $this->db = new Connection('sqlite::memory:', null, null, array(
             'scripts' => array(
                 <<<'SQL'

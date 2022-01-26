@@ -1,17 +1,17 @@
 <?php
 
-namespace Ekok\Sql\Tests;
-
-use Ekok\Sql\Builder;
 use Ekok\Sql\Helper;
-use PHPUnit\Framework\TestCase;
+use Ekok\Sql\Builder;
 
-class BuilderTest extends TestCase
+class BuilderTest extends \Codeception\Test\Unit
 {
+    /** @var \UnitTester */
+    protected $tester;
+
     /** @var Builder */
     private $builder;
 
-    public function setUp(): void
+    protected function _before()
     {
         $this->builder = new Builder(new Helper());
     }
