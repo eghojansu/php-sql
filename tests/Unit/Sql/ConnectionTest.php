@@ -141,25 +141,25 @@ SQL
     {
         return array(
             'default' => array(
-                array('count' => 5, 'current_page' => 1, 'next_page' => 2, 'prev_page' => 0, 'per_page' => 20, 'total' => null, 'last_page' => 2, 'first' => 1, 'last' => 5),
+                array('count' => 5, 'current_page' => 1, 'next_page' => 2, 'prev_page' => 0, 'per_page' => 20, 'total' => null, 'last_page' => 2, 'first' => 1, 'last' => 5, 'empty' => false),
             ),
             'filtering' => array(
-                array('count' => 1, 'current_page' => 1, 'next_page' => 2, 'prev_page' => 0, 'per_page' => 20, 'total' => null, 'last_page' => 2, 'first' => 1, 'last' => 1),
+                array('count' => 1, 'current_page' => 1, 'next_page' => 2, 'prev_page' => 0, 'per_page' => 20, 'total' => null, 'last_page' => 2, 'first' => 1, 'last' => 1, 'empty' => false),
                 1,
                 "name = 'row1'",
             ),
             'page 2' => array(
-                array('count' => 0, 'current_page' => 2, 'next_page' => 3, 'prev_page' => 1, 'per_page' => 20, 'total' => null, 'last_page' => 3, 'first' => 21, 'last' => 21),
+                array('count' => 0, 'current_page' => 2, 'next_page' => 3, 'prev_page' => 1, 'per_page' => 20, 'total' => null, 'last_page' => 3, 'first' => 21, 'last' => 21, 'empty' => false),
                 2,
             ),
             'perpage = 2' => array(
-                array('count' => 2, 'current_page' => 1, 'next_page' => 2, 'prev_page' => 0, 'per_page' => 2, 'total' => null, 'last_page' => 2, 'first' => 1, 'last' => 2),
+                array('count' => 2, 'current_page' => 1, 'next_page' => 2, 'prev_page' => 0, 'per_page' => 2, 'total' => null, 'last_page' => 2, 'first' => 1, 'last' => 2, 'empty' => false),
                 1,
                 null,
                 array('limit' => 2),
             ),
             'perpage = 2, page 3' => array(
-                array('count' => 1, 'current_page' => 3, 'next_page' => 4, 'prev_page' => 2, 'per_page' => 2, 'total' => null, 'last_page' => 4, 'first' => 5, 'last' => 5),
+                array('count' => 1, 'current_page' => 3, 'next_page' => 4, 'prev_page' => 2, 'per_page' => 2, 'total' => null, 'last_page' => 4, 'first' => 5, 'last' => 5, 'empty' => false),
                 3,
                 null,
                 array('limit' => 2),
@@ -192,25 +192,25 @@ SQL
     {
         return array(
             'default' => array(
-                array('count' => 5, 'current_page' => 1, 'next_page' => 1, 'prev_page' => 0, 'last_page' => 1, 'total' => 5, 'first' => 1, 'last' => 5, 'per_page' => 20),
+                array('count' => 5, 'current_page' => 1, 'next_page' => 1, 'prev_page' => 0, 'last_page' => 1, 'total' => 5, 'first' => 1, 'last' => 5, 'per_page' => 20, 'empty' => false),
             ),
             'filtering' => array(
-                array('count' => 1, 'current_page' => 1, 'next_page' => 1, 'prev_page' => 0, 'last_page' => 1, 'total' => 1, 'first' => 1, 'last' => 1, 'per_page' => 20),
+                array('count' => 1, 'current_page' => 1, 'next_page' => 1, 'prev_page' => 0, 'last_page' => 1, 'total' => 1, 'first' => 1, 'last' => 1, 'per_page' => 20, 'empty' => false),
                 1,
                 "name = 'row1'",
             ),
             'page 2' => array(
-                array('count' => 0, 'current_page' => 2, 'next_page' => 1, 'prev_page' => 1, 'last_page' => 1, 'total' => 5, 'first' => 21, 'last' => 21, 'per_page' => 20),
+                array('count' => 0, 'current_page' => 2, 'next_page' => 1, 'prev_page' => 1, 'last_page' => 1, 'total' => 5, 'first' => 21, 'last' => 21, 'per_page' => 20, 'empty' => false),
                 2,
             ),
             'perpage = 2' => array(
-                array('count' => 2, 'current_page' => 1, 'next_page' => 2, 'prev_page' => 0, 'last_page' => 3, 'total' => 5, 'first' => 1, 'last' => 2, 'per_page' => 2),
+                array('count' => 2, 'current_page' => 1, 'next_page' => 2, 'prev_page' => 0, 'last_page' => 3, 'total' => 5, 'first' => 1, 'last' => 2, 'per_page' => 2, 'empty' => false),
                 1,
                 null,
                 array('limit' => 2),
             ),
             'perpage = 2, page 3' => array(
-                array('count' => 1, 'current_page' => 3, 'next_page' => 3, 'prev_page' => 2, 'last_page' => 3, 'total' => 5, 'first' => 5, 'last' => 5, 'per_page' => 2),
+                array('count' => 1, 'current_page' => 3, 'next_page' => 3, 'prev_page' => 2, 'last_page' => 3, 'total' => 5, 'first' => 5, 'last' => 5, 'per_page' => 2, 'empty' => false),
                 3,
                 null,
                 array('limit' => 2),

@@ -63,9 +63,11 @@ class Connection
         $per_page = intval($options['limit'] ?? $this->options['pagination_size']);
         $offset = ($current_page - 1) * $per_page;
         $total = null;
+        $empty = false;
 
         if ($options['full'] ?? true) {
             $total = $this->count($table, $criteria, Arr::without($options, 'limit'));
+            $empty = $total === 0;
             $last_page = intval(ceil($total / $per_page));
         }
 
@@ -76,7 +78,7 @@ class Connection
         $first = $offset + 1;
         $last = max($first, $offset + $count);
 
-        return compact('subset', 'count', 'total', 'current_page', 'next_page', 'prev_page', 'last_page', 'per_page', 'first', 'last');
+        return compact('subset', 'empty', 'count', 'total', 'current_page', 'next_page', 'prev_page', 'last_page', 'per_page', 'first', 'last');
     }
 
     public function count(string $table, array|string $criteria = null, array $options = null): int
