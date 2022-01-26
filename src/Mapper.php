@@ -4,8 +4,8 @@ namespace Ekok\Sql;
 
 use Ekok\Utils\Arr;
 use Ekok\Utils\Str;
-use Ekok\Utils\Payload;
 use Ekok\Utils\Val;
+use Ekok\Utils\Payload;
 
 class Mapper implements \ArrayAccess, \Iterator, \Countable, \JsonSerializable
 {
