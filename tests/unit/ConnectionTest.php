@@ -7,9 +7,6 @@ use Ekok\Sql\Connection;
 
 class ConnectionTest extends \Codeception\Test\Unit
 {
-    /** @var \UnitTester */
-    protected $tester;
-
     /** @var Connection */
     private $db;
 

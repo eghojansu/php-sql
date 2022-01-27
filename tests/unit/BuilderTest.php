@@ -5,9 +5,6 @@ use Ekok\Sql\Builder;
 
 class BuilderTest extends \Codeception\Test\Unit
 {
-    /** @var \UnitTester */
-    protected $tester;
-
     /** @var Builder */
     private $builder;
 

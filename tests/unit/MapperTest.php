@@ -5,9 +5,6 @@ use Ekok\Sql\Connection;
 
 class MapperTest extends \Codeception\Test\Unit
 {
-    /** @var \UnitTester */
-    protected $tester;
-
     /** @var Connection */
     private $db;
 

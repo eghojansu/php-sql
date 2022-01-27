@@ -7,11 +7,11 @@ use Ekok\Utils\Payload;
 
 class Builder
 {
-    private $delimiter = ' ';
+    protected $delimiter = ' ';
 
     public function __construct(
-        private Helper $helper,
-        private string|null $driver = null,
+        protected Helper $helper,
+        protected string|null $driver = null,
         bool|null $format = null,
     ) {
         if ($format) {
