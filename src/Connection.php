@@ -127,7 +127,7 @@ class Connection
             $criteria[] = $this->getPdo()->lastInsertId();
 
             return $this->selectOne($table, $criteria, $loadOptions);
-        })() : 0;
+        })() : false;
     }
 
     public function update(string $table, array $data, array|string $criteria, array|bool|null $options = false): bool|int|array|object|null
@@ -136,7 +136,7 @@ class Connection
 
         $query = $this->query($sql, $values, $success);
 
-        return $success ? (false === $options ? $query->rowCount() : $this->selectOne($table, $criteria, true === $options ? null : $options)) : 0;
+        return $success ? (false === $options ? $query->rowCount() : $this->selectOne($table, $criteria, true === $options ? null : $options)) : false;
     }
 
     public function delete(string $table, array|string $criteria): bool|int
@@ -145,7 +145,7 @@ class Connection
 
         $query = $this->query($sql, $values, $success);
 
-        return $success ? $query->rowCount() : 0;
+        return $success ? $query->rowCount() : false;
     }
 
     public function insertBatch(string $table, array $data, array|string $criteria = null, array|string $options = null): bool|int|array|null
@@ -154,7 +154,7 @@ class Connection
 
         $query = $this->query($sql, $values, $success);
 
-        return $success ? ($criteria ? $this->select($table, $criteria, $options) : $query->rowCount()) : 0;
+        return $success ? ($criteria ? $this->select($table, $criteria, $options) : $query->rowCount()) : false;
     }
 
     public function query(string $sql, array $values = null, bool &$success = null): \PDOStatement
