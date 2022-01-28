@@ -2,7 +2,7 @@
 
 namespace Ekok\Sql;
 
-class ModifiableBuilder extends Builder
+class CustomBuilder extends Builder
 {
     protected $modifiers = array();
 

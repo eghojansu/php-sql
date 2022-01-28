@@ -1,21 +1,21 @@
 <?php
 
 use Ekok\Sql\Helper;
-use Ekok\Sql\ModifiableBuilder;
+use Ekok\Sql\CustomBuilder;
 
-class ModifiableBuilderTest extends \Codeception\Test\Unit
+class CustomBuilderTest extends \Codeception\Test\Unit
 {
-    /** @var ModifiableBuilder */
+    /** @var CustomBuilder */
     private $builder;
 
     protected function _before()
     {
-        $this->builder = new ModifiableBuilder(new Helper());
+        $this->builder = new CustomBuilder(new Helper());
     }
 
     public function testSelect()
     {
-        $this->builder->addModifier('select', static fn ($table, $criteria, $options, ModifiableBuilder $builder) => array($table, $builder->mergeCriteria($criteria, 'deleted_at is null'), $options));
+        $this->builder->addModifier('select', static fn ($table, $criteria, $options, CustomBuilder $builder) => array($table, $builder->mergeCriteria($criteria, 'deleted_at is null'), $options));
 
         $expected = array('SELECT * FROM "demo" WHERE deleted_at is null', array());
         $actual = $this->builder->select('demo');
@@ -54,7 +54,7 @@ class ModifiableBuilderTest extends \Codeception\Test\Unit
 
     public function testDelete()
     {
-        $this->builder->addModifier('delete', static fn ($table, $criteria, ModifiableBuilder $builder) => array($table, $builder->mergeCriteria($criteria, 'deleted_at is not null')));
+        $this->builder->addModifier('delete', static fn ($table, $criteria, CustomBuilder $builder) => array($table, $builder->mergeCriteria($criteria, 'deleted_at is not null')));
 
         $expected = array(
             'DELETE FROM "demo" WHERE id = ? AND (deleted_at is not null)',
