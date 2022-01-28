@@ -6,7 +6,6 @@ use Ekok\Utils\Str;
 
 class Helper
 {
-
     private $quotes = array();
     private $rawIdentifier = '"';
 
@@ -48,5 +47,37 @@ class Helper
     public function table(string $table): string
     {
         return $this->isRaw($table, $name) ? $name : $this->tablePrefix . $table;
+    }
+
+    public function joinCriteria(string|null $criteria, string|null $with, string $conj = null): string
+    {
+        if (!$with) {
+            return $criteria ?? '';
+        }
+
+        if ($criteria && $with && !preg_match('/^(and|or)/i', $with)) {
+            return ltrim($criteria . ' ' . strtoupper($conj ?? 'AND') . ' (' . $with . ')');
+        }
+
+        return trim($criteria . ' ' . $with);
+    }
+
+    public function mergeCriteria(array|string|null ...$criteria): array
+    {
+        return array_reduce(array_filter($criteria), function (array $criteria, $merge) {
+            if (is_string($merge)) {
+                $criteria[0] = $this->joinCriteria($criteria[0] ?? null, $merge);
+            } elseif ($merge) {
+                $criteria[0] = $this->joinCriteria($criteria[0] ?? null, $merge[0]);
+
+                array_push($criteria, ...array_slice($merge, 1));
+            }
+
+            if (empty($criteria[0])) {
+                return array();
+            }
+
+            return $criteria;
+        }, array());
     }
 }
