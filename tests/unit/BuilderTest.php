@@ -1,6 +1,5 @@
 <?php
 
-use Ekok\Sql\Helper;
 use Ekok\Sql\Builder;
 
 class BuilderTest extends \Codeception\Test\Unit
@@ -10,7 +9,7 @@ class BuilderTest extends \Codeception\Test\Unit
 
     protected function _before()
     {
-        $this->builder = new Builder(new Helper());
+        $this->builder = new Builder();
     }
 
     /** @dataProvider selectProvider */
@@ -67,7 +66,7 @@ class BuilderTest extends \Codeception\Test\Unit
 
     public function testSelectOffset()
     {
-        $builder = new Builder(new Helper('[]', '`'), 'sqlsrv');
+        $builder = new Builder('sqlsrv', null, '[]', '`');
 
         $expected = 'SELECT TOP 5 * FROM [demo] ORDER BY id';
         $this->assertEquals($expected, $builder->select('demo', null, array('limit' => 5, 'orders' => '`id'))[0]);
@@ -202,7 +201,7 @@ class BuilderTest extends \Codeception\Test\Unit
 
     public function testPlayingFormat()
     {
-        $builder = new Builder(new Helper("'"), null, true);
+        $builder = new Builder(null, null, "'", null, true);
         $lf = "\n";
 
         $expected = "SELECT{$lf}*{$lf}FROM 'demo'";
@@ -210,5 +209,24 @@ class BuilderTest extends \Codeception\Test\Unit
 
         $expected = "INSERT INTO 'demo'{$lf}('name',{$lf}'hint'){$lf}VALUES{$lf}(?, ?)";
         $this->assertEquals($expected, $builder->insert('demo', array('name' => 'foo', 'hint' => 'bar'))[0]);
+    }
+
+    public function testHelpers()
+    {
+        $builder = new Builder(null, 'prefix_', '`', '`');
+
+        $this->assertSame('`foo`.`bar`', $builder->quote('foo.bar'));
+        $this->assertSame(true, $builder->isRaw('`foo bar', $cut));
+        $this->assertSame('foo bar', $cut);
+        $this->assertSame('`foo bar', $builder->raw('foo bar'));
+        $this->assertSame('table', $builder->table('`table'));
+        $this->assertSame('prefix_table', $builder->table('table'));
+        $this->assertSame('', $builder->joinCriteria(null, null));
+        $this->assertSame('foo', $builder->joinCriteria(null, 'foo'));
+        $this->assertSame('foo AND (bar)', $builder->joinCriteria('foo', 'bar'));
+        $this->assertSame('foo and bar', $builder->joinCriteria('foo', 'and bar'));
+        $this->assertSame(array(), $builder->mergeCriteria(array('')));
+        $this->assertSame(array('foo AND (bar)'), $builder->mergeCriteria('foo', 'bar'));
+        $this->assertSame(array('foo AND (bar)'), $builder->mergeCriteria(array('foo'), array('bar')));
     }
 }

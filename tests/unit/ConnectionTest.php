@@ -1,6 +1,5 @@
 <?php
 
-use Ekok\Sql\Helper;
 use Ekok\Sql\Mapper;
 use Ekok\Sql\Builder;
 use Ekok\Sql\Connection;
@@ -212,18 +211,9 @@ SQL
         );
     }
 
-    public function testHelperMutation()
-    {
-        $helper = new Helper();
-
-        $this->db->setHelper($helper);
-
-        $this->assertSame($helper, $this->db->getHelper());
-    }
-
     public function testBuilderMutation()
     {
-        $builder = new Builder(new Helper());
+        $builder = new Builder();
 
         $this->db->setBuilder($builder);
 

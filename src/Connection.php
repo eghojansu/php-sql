@@ -19,9 +19,6 @@ class Connection
     /** @var string|null */
     private $name;
 
-    /** @var Helper */
-    private $helper;
-
     /** @var Builder */
     private $builder;
 
@@ -46,8 +43,7 @@ class Connection
 
         $this->driver = strstr($this->dsn, ':', true);
         $this->name = preg_match('/^.+?(?:dbname|database)=(.+?)(?=;|$)/is', $this->dsn, $match) ? str_replace('\\ ', ' ', $match[1]) : null;
-        $this->helper = new Helper($opt['quotes'], $opt['raw_identifier'], $opt['table_prefix']);
-        $this->builder = new Builder($this->helper, $this->driver, $opt['format_query']);
+        $this->builder = new Builder($this->driver, $opt['table_prefix'], $opt['quotes'], $opt['raw_identifier'], $opt['format_query']);
         $this->options = $opt;
     }
 
@@ -84,7 +80,7 @@ class Connection
     public function count(string $table, array|string $criteria = null, array $options = null): int
     {
         list($sql, $values) = $this->builder->select($table, $criteria, Arr::without($options, 'orders'));
-        list($sqlCount) = $this->builder->select($sql, null, array('sub' => true, 'alias' => '_c', 'columns' => array('_d' => $this->helper->raw('COUNT(*)'))));
+        list($sqlCount) = $this->builder->select($sql, null, array('sub' => true, 'alias' => '_c', 'columns' => array('_d' => $this->builder->raw('COUNT(*)'))));
 
         return intval($this->query($sqlCount, $values, $success)->fetchColumn(0));
     }
@@ -209,22 +205,10 @@ class Connection
         $mode = $pdo->getAttribute(\PDO::ATTR_ERRMODE);
         $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_SILENT);
 
-        $out = $pdo->query('SELECT 1 FROM ' . $this->helper->table($table) . ' LIMIT 1');
+        $out = $pdo->query('SELECT 1 FROM ' . $this->builder->table($table) . ' LIMIT 1');
         $pdo->setAttribute(\PDO::ATTR_ERRMODE, $mode);
 
         return !!$out;
-    }
-
-    public function getHelper(): Helper
-    {
-        return $this->helper;
-    }
-
-    public function setHelper(Helper $helper): static
-    {
-        $this->helper = $helper;
-
-        return $this;
     }
 
     public function getBuilder(): Builder

@@ -3,19 +3,32 @@
 namespace Ekok\Sql;
 
 use Ekok\Utils\Arr;
+use Ekok\Utils\Str;
 use Ekok\Utils\Payload;
 
 class Builder
 {
     protected $delimiter = ' ';
+    protected $quotes = array();
+    protected $rawIdentifier = '"';
 
     public function __construct(
-        protected Helper $helper,
         protected string|null $driver = null,
+        private string|null $tablePrefix = null,
+        string|array $quotes = null,
+        string|null $rawIdentifier = null,
         bool|null $format = null,
     ) {
         if ($format) {
             $this->delimiter = "\n";
+        }
+
+        if ($quotes) {
+            $this->quotes = array_slice(is_array($quotes) ? array_values($quotes) : str_split($quotes), 0, 2);
+        }
+
+        if ($rawIdentifier) {
+            $this->rawIdentifier = $rawIdentifier;
         }
     }
 
@@ -27,7 +40,7 @@ class Builder
 
         $sub = $o_sub ?? false;
         $alias = $o_alias ?? null;
-        $_table = $sub ? $table : $this->helper->table($table);
+        $_table = $sub ? $table : $this->table($table);
         $prefix = $alias ?? ($sub ? null : $_table);
         $lf = $this->delimiter;
         $sql = '';
@@ -38,10 +51,10 @@ class Builder
         }
 
         $sql .= $lf . (isset($o_columns) && $o_columns ? $this->columns($o_columns, $prefix, $lf) : '*');
-        $sql .= $lf . 'FROM ' . ($sub ? '(' . $table . ')' : $this->helper->quote($_table));
+        $sql .= $lf . 'FROM ' . ($sub ? '(' . $table . ')' : $this->quote($_table));
 
         if ($alias) {
-            $sql .= $lf . 'AS ' . $this->helper->quote($alias);
+            $sql .= $lf . 'AS ' . $this->quote($alias);
         }
 
         if (isset($o_joins) && $line = $this->joins($o_joins, $lf)) {
@@ -78,7 +91,7 @@ class Builder
     public function insert(string $table, array $data): array
     {
         return array(
-            'INSERT INTO ' . $this->helper->quote($this->helper->table($table)) . $this->delimiter .
+            'INSERT INTO ' . $this->quote($this->table($table)) . $this->delimiter .
             '(' . $this->columns(array_keys($data), null, $this->delimiter) . ')' . $this->delimiter .
             'VALUES' . $this->delimiter .
             '(' . str_repeat('?, ', count($data) - 1) . '?)',
@@ -95,8 +108,8 @@ class Builder
         array_push($values, ...array_slice($filter, 1));
 
         return array(
-            'UPDATE ' . $this->helper->quote($this->helper->table($table)) . $this->delimiter .
-            'SET ' . implode(' = ?,' . $this->delimiter, array_map(array($this->helper, 'quote'), array_keys($data))) . ' = ?' .
+            'UPDATE ' . $this->quote($this->table($table)) . $this->delimiter .
+            'SET ' . implode(' = ?,' . $this->delimiter, array_map(array($this, 'quote'), array_keys($data))) . ' = ?' .
             $withFilter,
             $values,
         );
@@ -109,7 +122,7 @@ class Builder
         $withFilter = $filter ? $this->delimiter . 'WHERE ' . $filter : null;
 
         return array(
-            'DELETE FROM ' . $this->helper->quote($this->helper->table($table)) . $withFilter,
+            'DELETE FROM ' . $this->quote($this->table($table)) . $withFilter,
             $values,
         );
     }
@@ -126,7 +139,7 @@ class Builder
         $columns = array_keys($first);
         $line = '(' . str_repeat('?, ', $firstCount - 1) . '?)';
 
-        $sql = 'INSERT INTO ' . $this->helper->quote($this->helper->table($table)) . $this->delimiter . '(' . $this->columns($columns) . ')' . $this->delimiter . 'VALUES ' . $line;
+        $sql = 'INSERT INTO ' . $this->quote($this->table($table)) . $this->delimiter . '(' . $this->columns($columns) . ')' . $this->delimiter . 'VALUES ' . $line;
         $values = array();
 
         foreach ($data as $pos => $row) {
@@ -146,7 +159,7 @@ class Builder
 
     public function expr(string $expr, string $prefix = null): string
     {
-        return $this->helper->isRaw($expr, $cut) ? $cut : $this->helper->quote((false === strpos($expr, '.') && $prefix ? $prefix . '.' : null) . $expr);
+        return $this->isRaw($expr, $cut) ? $cut : $this->quote((false === strpos($expr, '.') && $prefix ? $prefix . '.' : null) . $expr);
     }
 
     public function columns(string|array $columns, string $prefix = null, string $separator = ' '): string
@@ -156,7 +169,7 @@ class Builder
                 return $this->expr($column->value, $prefix);
             }
 
-            return $this->expr($column->value, $prefix) . ' AS ' . $this->helper->quote($column->key);
+            return $this->expr($column->value, $prefix) . ' AS ' . $this->quote($column->key);
         }, false));
     }
 
@@ -197,6 +210,64 @@ class Builder
             'sqlsrv' => $this->offsetSqlServer($limit, $offset, $sql, $top),
             default => trim(($limit ? 'LIMIT ' . $limit : '') . ' ' . ($offset ? 'OFFSET ' . $offset : '')),
         };
+    }
+
+    public function quote(string $expr): string
+    {
+        return Str::quote($expr, ...$this->quotes);
+    }
+
+    public function isRaw(string $expr, string &$cut = null): bool
+    {
+        $raw = str_starts_with($expr, $this->rawIdentifier);
+
+        if ($raw) {
+            $cut = substr($expr, strlen($this->rawIdentifier));
+        }
+
+        return $raw;
+    }
+
+    public function raw(string $expr): string
+    {
+        return $this->rawIdentifier . $expr;
+    }
+
+    public function table(string $table): string
+    {
+        return $this->isRaw($table, $name) ? $name : $this->tablePrefix . $table;
+    }
+
+    public function joinCriteria(string|null $criteria, string|null $with, string $conj = null): string
+    {
+        if (!$with) {
+            return $criteria ?? '';
+        }
+
+        if ($criteria && $with && !preg_match('/^(and|or)/i', $with)) {
+            return ltrim($criteria . ' ' . strtoupper($conj ?? 'AND') . ' (' . $with . ')');
+        }
+
+        return trim($criteria . ' ' . $with);
+    }
+
+    public function mergeCriteria(array|string|null ...$criteria): array
+    {
+        return array_reduce(array_filter($criteria), function (array $criteria, $merge) {
+            if (is_string($merge)) {
+                $criteria[0] = $this->joinCriteria($criteria[0] ?? null, $merge);
+            } elseif ($merge) {
+                $criteria[0] = $this->joinCriteria($criteria[0] ?? null, $merge[0]);
+
+                array_push($criteria, ...array_slice($merge, 1));
+            }
+
+            if (empty($criteria[0])) {
+                return array();
+            }
+
+            return $criteria;
+        }, array());
     }
 
     protected function offsetSqlServer(int $limit, int $offset, string $sql, bool &$top = null): string
