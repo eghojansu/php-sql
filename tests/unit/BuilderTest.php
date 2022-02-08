@@ -221,12 +221,21 @@ class BuilderTest extends \Codeception\Test\Unit
         $this->assertSame('`foo bar', $builder->raw('foo bar'));
         $this->assertSame('table', $builder->table('`table'));
         $this->assertSame('prefix_table', $builder->table('table'));
-        $this->assertSame('', $builder->joinCriteria(null, null));
-        $this->assertSame('foo', $builder->joinCriteria(null, 'foo'));
-        $this->assertSame('foo AND (bar)', $builder->joinCriteria('foo', 'bar'));
-        $this->assertSame('foo and bar', $builder->joinCriteria('foo', 'and bar'));
-        $this->assertSame(array(), $builder->mergeCriteria(array('')));
-        $this->assertSame(array('foo AND (bar)'), $builder->mergeCriteria('foo', 'bar'));
-        $this->assertSame(array('foo AND (bar)'), $builder->mergeCriteria(array('foo'), array('bar')));
+        $this->assertSame('', $builder->criteriaJoin(null, null));
+        $this->assertSame('foo', $builder->criteriaJoin(null, 'foo'));
+        $this->assertSame('foo AND (bar)', $builder->criteriaJoin('foo', 'bar'));
+        $this->assertSame('foo and bar', $builder->criteriaJoin('foo', 'and bar'));
+        $this->assertSame(array(), $builder->criteriaMerge(array('')));
+        $this->assertSame(array('foo AND (bar)'), $builder->criteriaMerge('foo', 'bar'));
+        $this->assertSame(array('foo AND (bar)'), $builder->criteriaMerge(array('foo'), array('bar')));
+        $this->assertSame(array('`foo` IN (?)', 'bar'), $builder->criteriaIn('foo', array('foo' => 'bar')));
+        $this->assertSame(array('foo IN (?)', 'bar'), $builder->criteriaIn('`foo', array('foo' => 'bar')));
+    }
+
+    public function testCriteriaInEmpty()
+    {
+        $this->expectExceptionMessage('Data was empty');
+
+        $this->builder->criteriaIn('foo', array());
     }
 }

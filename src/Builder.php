@@ -238,7 +238,7 @@ class Builder
         return $this->isRaw($table, $name) ? $name : $this->tablePrefix . $table;
     }
 
-    public function joinCriteria(string|null $criteria, string|null $with, string $conj = null): string
+    public function criteriaJoin(string|null $criteria, string|null $with, string $conj = null): string
     {
         if (!$with) {
             return $criteria ?? '';
@@ -251,13 +251,13 @@ class Builder
         return trim($criteria . ' ' . $with);
     }
 
-    public function mergeCriteria(array|string|null ...$criteria): array
+    public function criteriaMerge(array|string|null ...$criteria): array
     {
         return array_reduce(array_filter($criteria), function (array $criteria, $merge) {
             if (is_string($merge)) {
-                $criteria[0] = $this->joinCriteria($criteria[0] ?? null, $merge);
+                $criteria[0] = $this->criteriaJoin($criteria[0] ?? null, $merge);
             } elseif ($merge) {
-                $criteria[0] = $this->joinCriteria($criteria[0] ?? null, $merge[0]);
+                $criteria[0] = $this->criteriaJoin($criteria[0] ?? null, $merge[0]);
 
                 array_push($criteria, ...array_slice($merge, 1));
             }
@@ -268,6 +268,19 @@ class Builder
 
             return $criteria;
         }, array());
+    }
+
+    public function criteriaIn(string $column, array $data): array
+    {
+        if (!$data) {
+            throw new \LogicException('Data was empty');
+        }
+
+        $params = array_values($data);
+
+        array_unshift($params, ($this->isRaw($column, $cut) ? $cut : $this->quote($column)) . ' IN (' . str_repeat('?, ', count($params) - 1) . '?)');
+
+        return $params;
     }
 
     protected function offsetSqlServer(int $limit, int $offset, string $sql, bool &$top = null): string
