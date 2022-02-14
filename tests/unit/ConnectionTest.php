@@ -1,7 +1,7 @@
 <?php
 
+use Ekok\Logger\Log;
 use Ekok\Sql\Mapper;
-use Ekok\Sql\Builder;
 use Ekok\Sql\Connection;
 
 class ConnectionTest extends \Codeception\Test\Unit
@@ -9,9 +9,13 @@ class ConnectionTest extends \Codeception\Test\Unit
     /** @var Connection */
     private $db;
 
+    /** @var Log */
+    private $log;
+
     protected function _before()
     {
-        $this->db = new Connection('sqlite::memory:', null, null, array(
+        $this->log = new Log(array('directory' => TEST_TMP));
+        $this->db = new Connection($this->log, 'sqlite::memory:', null, null, array(
             'scripts' => array(
                 <<<'SQL'
 CREATE TABLE "demo" (
@@ -31,7 +35,6 @@ SQL
         $this->assertNull($this->db->getName());
         $this->assertNotNull($this->db->getVersion());
         $this->assertEquals('sqlite', $this->db->getDriver());
-        $this->assertInstanceOf(Builder::class, $this->db->getBuilder());
     }
 
     public function testDbManipulation()
@@ -77,7 +80,7 @@ SQL
     {
         $this->expectExceptionMessage('Unable to connect database');
 
-        $db = new Connection('sqlite::memory:', null, null, array(
+        $db = new Connection($this->log, 'sqlite::memory:', null, null, array(
             'scripts' => array(
                 <<<'SQL'
 CREATE TABLE "demo" (
@@ -93,10 +96,6 @@ SQL
 
     public function testInvalidQuery()
     {
-        $this->expectExceptionMessage('Unable to prepare query');
-
-        // failure query
-        $this->db->getPdo()->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_SILENT);
         $this->assertFalse($this->db->insert('demo', array('foo' => 'bar')));
     }
 
@@ -211,15 +210,6 @@ SQL
         );
     }
 
-    public function testBuilderMutation()
-    {
-        $builder = new Builder();
-
-        $this->db->setBuilder($builder);
-
-        $this->assertSame($builder, $this->db->getBuilder());
-    }
-
     public function testOptions()
     {
         $expected = array(
@@ -265,5 +255,28 @@ SQL
         $mapper = $this->db->map('demo');
 
         $this->assertSame('demo', $mapper->table());
+    }
+
+    /** @dataProvider stringifyProvider */
+    public function testStringify(string $expected, string $sql, array $values = null)
+    {
+        $actual = $this->db->stringify($sql, $values);
+
+        $this->assertSame($expected, $actual);
+    }
+
+    public function stringifyProvider()
+    {
+        return array(
+            'std' => array(
+                "SELECT * FROM table WHERE id = 999 AND name = 'FOO' AND active = true",
+                'SELECT * FROM table WHERE id = ? AND name = ? AND active = ?',
+                array(999, 'FOO', true),
+            ),
+            'no value' => array(
+                "SELECT * FROM table",
+                'SELECT * FROM table',
+            ),
+        );
     }
 }

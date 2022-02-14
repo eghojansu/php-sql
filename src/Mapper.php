@@ -75,7 +75,7 @@ class Mapper implements \ArrayAccess, \Iterator, \Countable, \JsonSerializable
 
     public function table(): string
     {
-        return $this->db->getBuilder()->isRaw($this->table, $table) ? $table : $this->table;
+        return $this->db->builder->isRaw($this->table, $table) ? $table : $this->table;
     }
 
     public function countRow(array|string $criteria = null, array $options = null): int
@@ -157,12 +157,11 @@ class Mapper implements \ArrayAccess, \Iterator, \Countable, \JsonSerializable
     {
         $this->keysCheck($ids);
 
-        $builder = $this->db->getBuilder();
         $criteria = $ids;
 
         array_unshift($criteria, Arr::reduce(
             $this->keys,
-            fn($prev, Payload $key) => ($prev ? $prev . ' AND ' : '') . $builder->quote($key->key) . ' = ?',
+            fn($prev, Payload $key) => ($prev ? $prev . ' AND ' : '') . $this->db->builder->quote($key->key) . ' = ?',
         ));
 
         return $this->findOne($criteria);
@@ -485,14 +484,12 @@ class Mapper implements \ArrayAccess, \Iterator, \Countable, \JsonSerializable
 
     protected function buildLoadCriteria(array $row): array
     {
-        $builder = $this->db->getBuilder();
-
-        return Arr::reduce($this->keys, static function (array $prev, Payload $key) use ($builder, $row) {
+        return Arr::reduce($this->keys, function (array $prev, Payload $key) use ($row) {
             if ($prev[0]) {
                 $prev[0] .= ' AND ';
             }
 
-            $prev[0] .= $builder->quote($key->key) . ' = ?';
+            $prev[0] .= $this->db->builder->quote($key->key) . ' = ?';
             $prev[] = $row[$key->key] ?? null;
 
             return $prev;

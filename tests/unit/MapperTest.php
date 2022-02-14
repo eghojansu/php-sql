@@ -1,5 +1,6 @@
 <?php
 
+use Ekok\Logger\Log;
 use Ekok\Sql\Mapper;
 use Ekok\Sql\Connection;
 
@@ -11,9 +12,13 @@ class MapperTest extends \Codeception\Test\Unit
     /** @var Mapper */
     private $mapper;
 
+    /** @var Log */
+    private $log;
+
     protected function _before()
     {
-        $this->db = new Connection('sqlite::memory:', null, null, array(
+        $this->log = new Log(array('directory' => TEST_TMP));
+        $this->db = new Connection($this->log, 'sqlite::memory:', null, null, array(
             'scripts' => array(
                 <<<'SQL'
 CREATE TABLE "demo" (

@@ -3,6 +3,7 @@
 namespace Ekok\Sql;
 
 use Ekok\Utils\Arr;
+use Ekok\Logger\Log;
 use Ekok\Utils\Payload;
 
 /**
@@ -13,19 +14,20 @@ class Connection
     protected $hive = array();
     protected $options = array();
 
+    /** @var Builder */
+    public $builder;
+
     /** @var string */
     private $driver;
 
     /** @var string|null */
     private $name;
 
-    /** @var Builder */
-    private $builder;
-
     /** @var array */
     private $maps = array();
 
     public function __construct(
+        public Log $log,
         protected string $dsn,
         protected string|null $username = null,
         protected string|null $password = null,
@@ -82,7 +84,7 @@ class Connection
         list($sql, $values) = $this->builder->select($table, $criteria, Arr::without($options, 'orders'));
         list($sqlCount) = $this->builder->select($sql, null, array('sub' => true, 'alias' => '_c', 'columns' => array('_d' => $this->builder->raw('COUNT(*)'))));
 
-        return intval($this->query($sqlCount, $values, $success)->fetchColumn(0));
+        return $this->query($sqlCount, $values, $query) ? intval($query->fetchColumn(0)) : 0;
     }
 
     public function select(string $table, array|string $criteria = null, array $options = null): array|null
@@ -91,9 +93,8 @@ class Connection
 
         $args = $options['fetch_args'] ?? array();
         $fetch = $options['fetch'] ?? \PDO::FETCH_ASSOC;
-        $query = $this->query($sql, $values, $success);
 
-        return $success ? (false === ($result = $query->fetchAll($fetch, ...$args)) ? null : $result) : null;
+        return $this->query($sql, $values, $query) ? (false === ($result = $query->fetchAll($fetch, ...$args)) ? null : $result) : null;
     }
 
     public function selectOne(string $table, array|string $criteria = null, array $options = null): array|object|null
@@ -105,9 +106,7 @@ class Connection
     {
         list($sql, $values) = $this->builder->insert($table, $data);
 
-        $query = $this->query($sql, $values, $success);
-
-        return $success ? (function () use ($query, $options, $table) {
+        return $this->query($sql, $values, $query) ? (function () use ($query, $options, $table) {
             if (!$options || (is_array($options) && !($load = $options['load'] ?? null))) {
                 return $query->rowCount();
             }
@@ -128,58 +127,52 @@ class Connection
 
     public function update(string $table, array $data, array|string $criteria, array|bool|null $options = false): bool|int|array|object|null
     {
-        list($sql, $values) = $this->getBuilder()->update($table, $data, $criteria);
+        list($sql, $values) = $this->builder->update($table, $data, $criteria);
 
-        $query = $this->query($sql, $values, $success);
-
-        return $success ? (false === $options ? $query->rowCount() : $this->selectOne($table, $criteria, true === $options ? null : $options)) : false;
+        return $this->query($sql, $values, $query) ? (false === $options ? $query->rowCount() : $this->selectOne($table, $criteria, true === $options ? null : $options)) : false;
     }
 
     public function delete(string $table, array|string $criteria): bool|int
     {
-        list($sql, $values) = $this->getBuilder()->delete($table, $criteria);
+        list($sql, $values) = $this->builder->delete($table, $criteria);
 
-        $query = $this->query($sql, $values, $success);
-
-        return $success ? $query->rowCount() : false;
+        return $this->query($sql, $values, $query) ? $query->rowCount() : false;
     }
 
     public function insertBatch(string $table, array $data, array|string $criteria = null, array|string $options = null): bool|int|array|null
     {
-        list($sql, $values) = $this->getBuilder()->insertBatch($table, $data);
+        list($sql, $values) = $this->builder->insertBatch($table, $data);
 
-        $query = $this->query($sql, $values, $success);
-
-        return $success ? ($criteria ? $this->select($table, $criteria, $options) : $query->rowCount()) : false;
+        return $this->query($sql, $values, $query) ? ($criteria ? $this->select($table, $criteria, $options) : $query->rowCount()) : false;
     }
 
-    public function query(string $sql, array $values = null, bool &$success = null): \PDOStatement
+    public function query(string $sql, array $values = null, \PDOStatement &$query = null): bool
     {
-        $query = $this->getPdo()->prepare($sql);
+        try {
+            $query = $this->getPdo()->prepare($sql);
+            $success = $query ? $query->execute($values) : false;
 
-        if (!$query) {
-            throw new \RuntimeException('Unable to prepare query');
+            return $success && '00000' === $query->errorCode();
+        } catch (\Throwable $error) {
+            $this->log->log(Log::LEVEL_ERROR, $error->getMessage(), compact('sql', 'values') + array(
+                'query' => $this->stringify($sql, $values),
+                'trace' => Arr::formatTrace($error),
+            ));
+
+            return false;
         }
-
-        $result = $query->execute($values);
-        $success = $result && '00000' === $query->errorCode();
-
-        return $query;
     }
 
     public function exec(string $sql, array $values = null): int
     {
-        $query = $this->query($sql, $values, $success);
-
-        return $success ? $query->rowCount() : 0;
+        return $this->query($sql, $values, $query) ? $query->rowCount() : 0;
     }
 
     public function transact(\Closure $fn)
     {
         $pdo = $this->getPdo();
-        $auto = !$pdo->inTransaction();
 
-        if ($auto) {
+        if ($auto = !$pdo->inTransaction()) {
             $pdo->beginTransaction();
         }
 
@@ -211,18 +204,6 @@ class Connection
         return !!$out;
     }
 
-    public function getBuilder(): Builder
-    {
-        return $this->builder;
-    }
-
-    public function setBuilder(Builder $builder): static
-    {
-        $this->builder = $builder;
-
-        return $this;
-    }
-
     public function map(string $name): Mapper
     {
         $setup = $this->maps[$name] ?? null;
@@ -247,6 +228,26 @@ class Connection
         return $this;
     }
 
+    public function stringify(string $sql, array $values = null): string
+    {
+        $text = $sql;
+
+        if ($values) {
+            $search = array();
+            $replace = array();
+            $pdo = $this->getPdo();
+
+            array_walk($values, function ($value, $key) use ($pdo, &$search, &$replace) {
+                $search[] = '/' . preg_quote(is_numeric($key) ? chr(0) . '?' : $key) . '/';
+                $replace[] = is_string($value) ? $pdo->quote($value) : (is_scalar($value) ? var_export($value, true) : $pdo->quote((string) $value));
+            });
+
+            $text = preg_replace($search, $replace, str_replace('?', chr(0) . '?', $sql), 1);
+        }
+
+        return $text;
+    }
+
     public function getOptions(): array
     {
         return $this->options;
@@ -269,7 +270,7 @@ class Connection
 
     public function getPdo(): \PDO
     {
-        return $this->hive['pdo'] ?? ($this->hive['pdo'] = self::createPDOConnection(
+        return $this->hive['pdo'] ?? ($this->hive['pdo'] = $this->createPDOConnection(
             $this->dsn,
             $this->username,
             $this->password,
@@ -283,14 +284,13 @@ class Connection
         throw new \LogicException('Cloning Connection is prohibited');
     }
 
-    public static function createPDOConnection(
+    public function createPDOConnection(
         string $dsn,
         string $username = null,
         string $password = null,
         array $options = null,
         array $scripts = null,
-    ): \PDO
-    {
+    ): \PDO {
         try {
             $pdo = new \PDO($dsn, $username, $password, $options);
 
@@ -298,6 +298,8 @@ class Connection
 
             return $pdo;
         } catch (\Throwable $error) {
+            $this->log->log(Log::LEVEL_ERROR, $error->getMessage(), Arr::formatTrace($error));
+
             throw new \RuntimeException('Unable to connect database', 0, $error);
         }
     }
