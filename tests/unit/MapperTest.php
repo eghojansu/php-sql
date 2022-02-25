@@ -34,9 +34,7 @@ CREATE TABLE "composite_key" (
 SQL
             ),
         ));
-        $this->mapper = new Mapper($this->db, 'demo', 'id', array(
-            'id' => 'int',
-        ));
+        $this->mapper = (new Mapper($this->db, 'demo', 'id'))->casts(array('id' => 'int'));
     }
 
     public function testUsage()
@@ -148,6 +146,31 @@ SQL
 
         unset($mapper['value']);
         $this->assertSame(null, $mapper['value']);
+
+        $this->assertFalse($mapper->readonly());
+        $this->assertSame(array('ignored_column' => true), $mapper->columnsIgnore());
+        $this->assertSame(array(
+            'prop_arr' => true,
+            'prop_json' => true,
+            'prop_int' => true,
+            'prop_float' => true,
+            'prop_bool' => true,
+            'prop_str' => true,
+            'prop_date' => true,
+            'prop_datetime' => true,
+            'username' => true,
+            'name' => true,
+        ), $mapper->columnsLoad());
+        $this->assertSame(array(
+            'prop_arr' => 'arr',
+            'prop_json' => 'json',
+            'prop_int' => 'int',
+            'prop_float' => 'float',
+            'prop_bool' => 'bool',
+            'prop_str' => 'str',
+            'prop_date' => 'date',
+            'prop_datetime' => 'datetime',
+        ), $mapper->casts());
     }
 
     public function testDrySaving()

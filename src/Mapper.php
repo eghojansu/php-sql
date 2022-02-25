@@ -42,21 +42,9 @@ class Mapper implements \ArrayAccess, \Iterator, \Countable, \JsonSerializable
         protected Connection $db,
         string|null $table = null,
         string|array|null $keys = null,
-        array|null $casts = null,
-        bool|null $readonly = null,
-        string|array|null $columnsLoad = null,
-        string|array|null $columnsIgnore = null,
     ) {
         if (!$this->table) {
             $this->table = $table ?? Str::className(static::class, true);
-        }
-
-        if ($columnsLoad) {
-            $this->columnsLoad = Arr::fill($columnsLoad);
-        }
-
-        if ($columnsIgnore) {
-            $this->columnsIgnore = Arr::fill($columnsIgnore);
         }
 
         if ($keys) {
@@ -67,14 +55,6 @@ class Mapper implements \ArrayAccess, \Iterator, \Countable, \JsonSerializable
                 ),
                 array(),
             );
-        }
-
-        if ($casts) {
-            $this->casts = $casts;
-        }
-
-        if (null !== $readonly) {
-            $this->readonly = $readonly;
         }
     }
 
@@ -315,6 +295,50 @@ class Mapper implements \ArrayAccess, \Iterator, \Countable, \JsonSerializable
     public function valid(): bool
     {
         return isset($this->rows[$this->ptr]);
+    }
+
+    public function casts(array ...$casts): static|array
+    {
+        if ($casts) {
+            $this->casts = $casts[0];
+
+            return $this;
+        }
+
+        return $this->casts;
+    }
+
+    public function readonly(bool ...$readonly): static|bool
+    {
+        if ($readonly) {
+            $this->readonly = $readonly[0];
+
+            return $this;
+        }
+
+        return $this->readonly;
+    }
+
+    public function columnsLoad(string|array ...$columnsLoad): static|array
+    {
+        if ($columnsLoad) {
+            $this->columnsLoad = Arr::fill($columnsLoad[0]);
+
+            return $this;
+        }
+
+        return $this->columnsLoad;
+    }
+
+    public function columnsIgnore(string|array ...$columnsIgnore): static|array
+    {
+        if ($columnsIgnore) {
+            $this->columnsIgnore = Arr::fill($columnsIgnore[0]);
+
+            return $this;
+        }
+
+        return $this->columnsIgnore;
     }
 
     public function offsetExists(mixed $offset): bool

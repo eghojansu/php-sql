@@ -9,7 +9,8 @@ final class UserMap extends Mapper
 
     public function __construct(Connection $db, bool $readonly = false)
     {
-        $casts = array(
+        parent::__construct($db, null, array('username' => false));
+        $this->casts(array(
             'prop_arr' => 'arr',
             'prop_json' => 'json',
             'prop_int' => 'int',
@@ -18,17 +19,10 @@ final class UserMap extends Mapper
             'prop_str' => 'str',
             'prop_date' => 'date',
             'prop_datetime' => 'datetime',
-        );
-
-        parent::__construct(
-            $db,
-            null,
-            array('username' => false),
-            $casts,
-            $readonly,
-            array_merge(array_keys($casts), array('username', 'name')),
-            'ignored_column',
-        );
+        ));
+        $this->readonly($readonly);
+        $this->columnsLoad(array_merge(array_keys($this->casts), array('username', 'name')));
+        $this->columnsIgnore('ignored_column');
     }
 
     public function getValue()
