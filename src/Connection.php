@@ -4,7 +4,6 @@ namespace Ekok\Sql;
 
 use Ekok\Utils\Arr;
 use Ekok\Logger\Log;
-use Ekok\Utils\Payload;
 
 /**
  * PDO Sql Connection Wrapper
@@ -294,7 +293,7 @@ class Connection
         try {
             $pdo = new \PDO($dsn, $username, $password, $options);
 
-            Arr::walk($scripts ?? array(), fn(Payload $script) => $pdo->exec($script->value));
+            Arr::each($scripts ?? array(), fn($script) => $pdo->exec($script));
 
             return $pdo;
         } catch (\Throwable $error) {

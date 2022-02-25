@@ -5,7 +5,6 @@ namespace Ekok\Sql;
 use Ekok\Utils\Arr;
 use Ekok\Utils\Str;
 use Ekok\Utils\Val;
-use Ekok\Utils\Payload;
 
 class Mapper implements \ArrayAccess, \Iterator, \Countable, \JsonSerializable
 {
@@ -61,7 +60,13 @@ class Mapper implements \ArrayAccess, \Iterator, \Countable, \JsonSerializable
         }
 
         if ($keys) {
-            $this->keys = Arr::each(Arr::ensure($keys), fn(Payload $auto) => $auto->indexed() ?  $auto->update(true, $auto->value) : $auto->value(!!$auto->value));
+            $this->keys = Arr::reduce(
+                Arr::ensure($keys),
+                static fn (array $keys, $field, $key) => $keys + array(
+                    (is_numeric($key) ? $field : $key) => is_numeric($key) || !!$field,
+                ),
+                array(),
+            );
         }
 
         if ($casts) {
@@ -161,7 +166,7 @@ class Mapper implements \ArrayAccess, \Iterator, \Countable, \JsonSerializable
 
         array_unshift($criteria, Arr::reduce(
             $this->keys,
-            fn($prev, Payload $key) => ($prev ? $prev . ' AND ' : '') . $this->db->builder->quote($key->key) . ' = ?',
+            fn($prev, ...$args) => ($prev ? $prev . ' AND ' : '') . $this->db->builder->quote($args[1]) . ' = ?',
         ));
 
         return $this->findOne($criteria);
@@ -191,7 +196,7 @@ class Mapper implements \ArrayAccess, \Iterator, \Countable, \JsonSerializable
             $saved = $this->db->insert($this->table, $update) > 0;
 
             if ($saved && $this->keys) {
-                $auto = Arr::first($this->keys, fn(Payload $key) => $key->value ? $key->key : null);
+                $auto = Arr::first($this->keys, fn($key, $field) => $key ? $field : null);
                 $criteria = $this->buildLoadCriteria(Arr::merge($update, $auto ? array($auto => $this->db->lastId()) : array()));
             }
         }
@@ -222,18 +227,25 @@ class Mapper implements \ArrayAccess, \Iterator, \Countable, \JsonSerializable
         if (!$this->getters) {
             $ref = new \ReflectionClass($this);
 
-            $this->getters = Arr::each(
+            $this->getters = Arr::reduce(
                 $ref->getMethods(\ReflectionMethod::IS_PUBLIC),
-                fn(Payload $method) => ($accesor = Str::startsWith($method->value->name, 'get', 'has', 'is')) ?
-                    $method->update($method->value->name, Str::caseSnake(substr($method->value->name, strlen($accesor)))) : null,
-                true,
+                static fn(array $getters, \ReflectionMethod $method) => $getters + (
+                    ($accesor = Str::startsWith($method->name, 'get', 'has', 'is')) ?
+                        array(Str::caseSnake(substr($method->name, strlen($accesor))) => $method->name) :
+                        array()
+                ),
+                array(),
             );
         }
 
         $row = $this->fixData(array_replace($this->castOutRow($this->row()), $this->changes()));
 
         if ($this->getters) {
-            $row += Arr::each($this->getters, fn(Payload $method) => $method->update($this->{$method->value}(), $method->key));
+            $row += Arr::reduce(
+                $this->getters,
+                fn (array $row, $method, $name) => $row + array($name => $this->$method()),
+                array(),
+            );
         }
 
         return $row;
@@ -259,7 +271,7 @@ class Mapper implements \ArrayAccess, \Iterator, \Countable, \JsonSerializable
     public function all(): array
     {
         $ptr = $this->ptr;
-        $data = Arr::each($this, fn(Payload $self) => $self->value->toArray());
+        $data = Arr::each($this, fn($self) => $self->toArray());
         $this->ptr = $ptr;
 
         return $data;
@@ -439,7 +451,7 @@ class Mapper implements \ArrayAccess, \Iterator, \Countable, \JsonSerializable
 
     protected function castOutRow(array $row): array
     {
-        return Arr::each($row, fn(Payload $value) => $this->castOut($value->key, $value->value));
+        return Arr::each($row, fn($value, $key) => $this->castOut($key, $value));
     }
 
     protected function castOut(string $column, string|null $var): \DateTime|string|int|float|array|bool|null
@@ -460,7 +472,7 @@ class Mapper implements \ArrayAccess, \Iterator, \Countable, \JsonSerializable
 
     protected function castInRow(array $row): array
     {
-        return Arr::each($row, fn(Payload $value) => $this->castIn($value->key, $value->value));
+        return Arr::each($row, fn($value, $key) => $this->castIn($key, $value));
     }
 
     protected function castIn(string $column, string|int|float|bool|array|object|null $var): string|int|float|bool|null
@@ -484,13 +496,13 @@ class Mapper implements \ArrayAccess, \Iterator, \Countable, \JsonSerializable
 
     protected function buildLoadCriteria(array $row): array
     {
-        return Arr::reduce($this->keys, function (array $prev, Payload $key) use ($row) {
+        return Arr::reduce($this->keys, function (array $prev, ...$args) use ($row) {
             if ($prev[0]) {
                 $prev[0] .= ' AND ';
             }
 
-            $prev[0] .= $this->db->builder->quote($key->key) . ' = ?';
-            $prev[] = $row[$key->key] ?? null;
+            $prev[0] .= $this->db->builder->quote($args[1]) . ' = ?';
+            $prev[] = $row[$args[1]] ?? null;
 
             return $prev;
         }, array(''));

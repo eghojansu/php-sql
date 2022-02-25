@@ -246,7 +246,9 @@ SQL
         $this->assertInstanceOf(UserMap::class, $user);
         $this->assertCount(0, $user);
         $this->assertSame('user_map', $user->table());
+        define('x', 1);
         $this->assertTrue($user->fromArray(UserMap::generateRow('foo'))->save());
+        $this->assertTrue($user->valid());
         $this->assertCount(1, $user);
     }
 

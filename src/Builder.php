@@ -4,7 +4,6 @@ namespace Ekok\Sql;
 
 use Ekok\Utils\Arr;
 use Ekok\Utils\Str;
-use Ekok\Utils\Payload;
 
 class Builder
 {
@@ -151,7 +150,7 @@ class Builder
                 $sql .= "," . $this->delimiter . $line;
             }
 
-            array_push($values, ...Arr::each($columns, fn(Payload $column) => $row[$column->value]));
+            array_push($values, ...Arr::each($columns, static fn($column) => $row[$column]));
         }
 
         return array($sql, $values);
@@ -164,23 +163,23 @@ class Builder
 
     public function columns(string|array $columns, string $prefix = null, string $separator = ' '): string
     {
-        return implode(',' . $separator, Arr::each((array) $columns, function (Payload $column) use ($prefix) {
-            if ($column->indexed()) {
-                return $this->expr($column->value, $prefix);
+        return implode(',' . $separator, Arr::each((array) $columns, function ($column, $key) use ($prefix) {
+            if (is_numeric($key)) {
+                return $this->expr($column, $prefix);
             }
 
-            return $this->expr($column->value, $prefix) . ' AS ' . $this->quote($column->key);
+            return $this->expr($column, $prefix) . ' AS ' . $this->quote($key);
         }, false));
     }
 
     public function joins(string|array $joins, string $separator = "\n"): string
     {
-        return implode($separator, Arr::each((array) $joins, function (Payload $join) {
-            if (preg_match('/^(.+)join/i', $join->value)) {
-                return $join->value;
+        return implode($separator, Arr::each((array) $joins, function ($join) {
+            if (preg_match('/^(.+)join/i', $join)) {
+                return $join;
             }
 
-            return 'JOIN ' . $join->value;
+            return 'JOIN ' . $join;
         }, false));
     }
 
@@ -191,12 +190,12 @@ class Builder
 
     public function orders(string|array $orders, string $prefix = null, string $separator = ' '): string
     {
-        return implode(',' . $separator, Arr::each((array) $orders, function (Payload $column) use ($prefix) {
-            if ($column->indexed()) {
-                return $this->expr($column->value, $prefix);
+        return implode(',' . $separator, Arr::each((array) $orders, function ($column, $key) use ($prefix) {
+            if (is_numeric($key)) {
+                return $this->expr($column, $prefix);
             }
 
-            return $this->expr($column->key, $prefix) . ' ' . strtoupper($column->value);
+            return $this->expr($key, $prefix) . ' ' . strtoupper($column);
         }, false));
     }
 
