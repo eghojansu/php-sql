@@ -8,59 +8,58 @@ use Ekok\Utils\Val;
 
 class Mapper implements \ArrayAccess, \Iterator, \Countable, \JsonSerializable
 {
+    /** @var Connection */
+    private $db;
+
     /** @var int */
-    protected $ptr = -1;
+    private $ptr = -1;
 
     /** @var array */
-    protected $rows = array();
+    private $rows = array();
 
     /** @var array */
-    protected $updates = array();
+    private $updates = array();
 
     /** @var array */
-    protected $keys = array();
+    private $keys = array();
 
     /** @var array */
-    protected $columnsLoad = array();
+    private $columnsLoad = array();
 
     /** @var array */
-    protected $columnsIgnore = array();
+    private $columnsIgnore = array();
 
     /** @var array */
-    protected $casts = array();
+    private $casts = array();
 
     /** @var bool */
-    protected $readonly = false;
+    private $readonly = false;
 
     /** @var array */
-    protected $getters;
+    private $getters;
 
     /** @var string */
-    protected $table;
+    private $table;
 
     public function __construct(
-        protected Connection $db,
-        string|null $table = null,
-        string|array|null $keys = null,
+        Connection $db,
+        string $table = null,
+        string|array $keys = null,
     ) {
-        if (!$this->table) {
-            $this->table = $table ?? Str::className(static::class, true);
-        }
-
-        if ($keys) {
-            $this->keys = Arr::reduce(
-                Arr::ensure($keys),
-                static fn (array $keys, $field, $key) => $keys + array(
-                    (is_numeric($key) ? $field : $key) => is_numeric($key) || !!$field,
-                ),
-                array(),
-            );
-        }
+        $this->db = $db;
+        $this->table = $this->table ?? $table ?? Str::className(static::class, true);
+        $this->keys = Arr::reduce(
+            Arr::ensure($keys),
+            static fn (array $keys, $field, $key) => $keys + array(
+                (is_numeric($key) ? $field : $key) => is_numeric($key) || !!$field,
+            ),
+            array(),
+        );
     }
 
     public function table(): string
     {
-        return $this->db->builder->isRaw($this->table, $table) ? $table : $this->table;
+        return $this->db->getBuilder()->isRaw($this->table, $table) ? $table : $this->table;
     }
 
     public function countRow(array|string $criteria = null, array $options = null): int
@@ -143,10 +142,11 @@ class Mapper implements \ArrayAccess, \Iterator, \Countable, \JsonSerializable
         $this->keysCheck($ids);
 
         $criteria = $ids;
+        $builder = $this->db->getBuilder();
 
         array_unshift($criteria, Arr::reduce(
             $this->keys,
-            fn($prev, ...$args) => ($prev ? $prev . ' AND ' : '') . $this->db->builder->quote($args[1]) . ' = ?',
+            fn($prev, ...$args) => ($prev ? $prev . ' AND ' : '') . $builder->quote($args[1]) . ' = ?',
         ));
 
         return $this->findOne($criteria);
@@ -520,12 +520,14 @@ class Mapper implements \ArrayAccess, \Iterator, \Countable, \JsonSerializable
 
     protected function buildLoadCriteria(array $row): array
     {
-        return Arr::reduce($this->keys, function (array $prev, ...$args) use ($row) {
+        $builder = $this->db->getBuilder();
+
+        return Arr::reduce($this->keys, static function (array $prev, ...$args) use ($row, $builder) {
             if ($prev[0]) {
                 $prev[0] .= ' AND ';
             }
 
-            $prev[0] .= $this->db->builder->quote($args[1]) . ' = ?';
+            $prev[0] .= $builder->quote($args[1]) . ' = ?';
             $prev[] = $row[$args[1]] ?? null;
 
             return $prev;

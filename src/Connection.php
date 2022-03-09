@@ -10,11 +10,20 @@ use Ekok\Logger\Log;
  */
 class Connection
 {
-    protected $hive = array();
-    protected $options = array();
-
     /** @var Builder */
-    public $builder;
+    private $builder;
+
+    /** @var Log */
+    private $log;
+
+    /** @var string */
+    private $dsn;
+
+    /** @var string */
+    private $username;
+
+    /** @var string */
+    private $password;
 
     /** @var string */
     private $driver;
@@ -25,27 +34,39 @@ class Connection
     /** @var array */
     private $maps = array();
 
-    public function __construct(
-        public Log $log,
-        protected string $dsn,
-        protected string|null $username = null,
-        protected string|null $password = null,
-        array|null $options = null,
-    ) {
-        $opt = Arr::merge(array(
-            'pagination_size' => 20,
-            'format_query' => null,
-            'raw_identifier' => null,
-            'table_prefix' => null,
-            'quotes' => array(),
-            'scripts' => array(),
-            'options' => array(),
-        ), $options);
+    /** @var array */
+    private $options = array(
+        'pagination_size' => 20,
+        'format_query' => null,
+        'raw_identifier' => null,
+        'table_prefix' => null,
+        'quotes' => null,
+        'scripts' => null,
+        'options' => null,
+    );
 
-        $this->driver = strstr($this->dsn, ':', true);
-        $this->name = preg_match('/^.+?(?:dbname|database)=(.+?)(?=;|$)/is', $this->dsn, $match) ? str_replace('\\ ', ' ', $match[1]) : null;
-        $this->builder = new Builder($this->driver, $opt['table_prefix'], $opt['quotes'], $opt['raw_identifier'], $opt['format_query']);
-        $this->options = $opt;
+    public function __construct(
+        Log $log,
+        string $dsn,
+        string $username = null,
+        string $password = null,
+        array $options = null,
+    ) {
+        $this->log = $log;
+        $this->dsn = $dsn;
+        $this->username = $username;
+        $this->password = $password;
+        $this->options = ($options ?? array()) + $this->options;
+        $this->driver = strstr($dsn, ':', true);
+        $this->name = self::parseDbName($dsn);
+
+        $this->setBuilder(new Builder(
+            $this->driver,
+            $this->options['table_prefix'],
+            $this->options['quotes'],
+            $this->options['raw_identifier'],
+            $this->options['format_query'],
+        ));
     }
 
     public function simplePaginate(string $table, int $page = 1, array|string $criteria = null, array $options = null): array
@@ -203,6 +224,18 @@ class Connection
         return !!$out;
     }
 
+    public function getBuilder(): Builder
+    {
+        return $this->builder;
+    }
+
+    public function setBuilder(Builder $builder): static
+    {
+        $this->builder = $builder;
+
+        return $this;
+    }
+
     public function map(string $name): Mapper
     {
         $setup = $this->maps[$name] ?? null;
@@ -301,5 +334,10 @@ class Connection
 
             throw new \RuntimeException('Unable to connect database', 0, $error);
         }
+    }
+
+    private static function parseDbName(string $dsn): string|null
+    {
+        return preg_match('/^.+?(?:dbname|database)=(.+?)(?=;|$)/is', $dsn, $match) ? str_replace('\\ ', ' ', $match[1]) : null;
     }
 }

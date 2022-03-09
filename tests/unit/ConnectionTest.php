@@ -217,9 +217,9 @@ SQL
             'format_query' => null,
             'raw_identifier' => null,
             'table_prefix' => null,
-            'quotes' => array(),
+            'quotes' => null,
+            'options' => null,
             'scripts' => array(),
-            'options' => array(),
         );
         $actual = $this->db->getOptions();
         $actual['scripts'] = array();

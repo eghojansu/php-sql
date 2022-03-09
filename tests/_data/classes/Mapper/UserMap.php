@@ -21,7 +21,7 @@ final class UserMap extends Mapper
             'prop_datetime' => 'datetime',
         ));
         $this->readonly($readonly);
-        $this->columnsLoad(array_merge(array_keys($this->casts), array('username', 'name')));
+        $this->columnsLoad(array_merge(array_keys($this->casts()), array('username', 'name')));
         $this->columnsIgnore('ignored_column');
     }
 

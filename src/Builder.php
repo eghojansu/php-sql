@@ -7,28 +7,24 @@ use Ekok\Utils\Str;
 
 class Builder
 {
-    protected $delimiter = ' ';
-    protected $quotes = array();
-    protected $rawIdentifier = '"';
+    private $tablePrefix;
+    private $driver;
+    private $quotes;
+    private $delimiter;
+    private $rawIdentifier;
 
     public function __construct(
-        protected string|null $driver = null,
-        private string|null $tablePrefix = null,
+        string $driver = null,
+        string $tablePrefix = null,
         string|array $quotes = null,
         string|null $rawIdentifier = null,
         bool|null $format = null,
     ) {
-        if ($format) {
-            $this->delimiter = "\n";
-        }
-
-        if ($quotes) {
-            $this->quotes = array_slice(is_array($quotes) ? array_values($quotes) : str_split($quotes), 0, 2);
-        }
-
-        if ($rawIdentifier) {
-            $this->rawIdentifier = $rawIdentifier;
-        }
+        $this->driver = $driver;
+        $this->tablePrefix = $tablePrefix;
+        $this->quotes = $quotes;
+        $this->delimiter = $format ? "\n" : ' ';
+        $this->rawIdentifier = $rawIdentifier ?? '"';
     }
 
     public function select(string $table, array|string $criteria = null, array $options = null): array
@@ -213,7 +209,7 @@ class Builder
 
     public function quote(string $expr): string
     {
-        return Str::quote($expr, ...$this->quotes);
+        return Str::quote($expr, $this->quotes, '.');
     }
 
     public function isRaw(string $expr, string &$cut = null): bool
