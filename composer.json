@@ -21,11 +21,13 @@
     "require": {
         "php": ">=8.0",
         "ekok/php-utils": "dev-master",
-        "ekok/php-logger": "dev-master"
+        "ekok/php-logger": "dev-master",
+        "ekok/php-event-dispatcher": "dev-master"
     },
     "require-dev": {
         "codeception/codeception": "~4.1",
         "codeception/module-phpbrowser": "^1.0.0",
-        "codeception/module-asserts": "^1.0.0"
+        "codeception/module-asserts": "^1.0.0",
+        "ekok/php-container": "dev-master"
     }
 }

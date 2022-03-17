@@ -66,7 +66,11 @@ class BuilderTest extends \Codeception\Test\Unit
 
     public function testSelectOffset()
     {
-        $builder = new Builder('sqlsrv', null, '[]', '`');
+        $builder = new Builder(array(
+            'driver' => 'sqlsrv',
+            'quotes' => '[]',
+            'raw_identifier' => '`',
+        ));
 
         $expected = 'SELECT TOP 5 * FROM [demo] ORDER BY id';
         $this->assertEquals($expected, $builder->select('demo', null, array('limit' => 5, 'orders' => '`id'))[0]);
@@ -201,7 +205,10 @@ class BuilderTest extends \Codeception\Test\Unit
 
     public function testPlayingFormat()
     {
-        $builder = new Builder(null, null, "'", null, true);
+        $builder = new Builder(array(
+            'format_query' => true,
+            'quotes' => "'",
+        ));
         $lf = "\n";
 
         $expected = "SELECT{$lf}*{$lf}FROM 'demo'";
@@ -213,7 +220,11 @@ class BuilderTest extends \Codeception\Test\Unit
 
     public function testHelpers()
     {
-        $builder = new Builder(null, 'prefix_', '`', '`');
+        $builder = new Builder(array(
+            'quotes' => "`",
+            'raw_identifier' => "`",
+            'table_prefix' => 'prefix_',
+        ));
 
         $this->assertSame('`foo`.`bar`', $builder->quote('foo.bar'));
         $this->assertSame(true, $builder->isRaw('`foo bar', $cut));
@@ -237,5 +248,19 @@ class BuilderTest extends \Codeception\Test\Unit
         $this->expectExceptionMessage('Data was empty');
 
         $this->builder->criteriaIn('foo', array());
+    }
+
+    public function testOptions()
+    {
+        $expected = array(
+            'driver' => null,
+            'table_prefix' => null,
+            'quotes' => null,
+            'delimiter' => "\n",
+            'raw_identifier' => '"',
+        );
+        $actual = $this->builder->getOptions();
+
+        $this->assertSame($expected, $actual);
     }
 }

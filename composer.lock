@@ -4,8 +4,103 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "5fa8978edd9dcb7bf8cff5bb976aa90b",
+    "content-hash": "528d1efe905d5c1b5636eec2bd2331d3",
     "packages": [
+        {
+            "name": "ekok/php-container",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/eghojansu/php-container.git",
+                "reference": "4f39f54b8ff6e6c76b8920a7a9e2631e60b1fec7"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/eghojansu/php-container/zipball/4f39f54b8ff6e6c76b8920a7a9e2631e60b1fec7",
+                "reference": "4f39f54b8ff6e6c76b8920a7a9e2631e60b1fec7",
+                "shasum": ""
+            },
+            "require": {
+                "ekok/php-utils": "dev-master",
+                "php": ">=8.0"
+            },
+            "require-dev": {
+                "codeception/codeception": "~4.1",
+                "codeception/module-asserts": "^1.0.0",
+                "codeception/module-phpbrowser": "^1.0.0"
+            },
+            "default-branch": true,
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Ekok\\Container\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Eko Kurniawan",
+                    "email": "setiawanegho@gmail.com"
+                }
+            ],
+            "description": "PHP Container",
+            "support": {
+                "issues": "https://github.com/eghojansu/php-container/issues",
+                "source": "https://github.com/eghojansu/php-container/tree/master"
+            },
+            "time": "2022-03-11T15:49:26+00:00"
+        },
+        {
+            "name": "ekok/php-event-dispatcher",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/eghojansu/php-event-dispatcher.git",
+                "reference": "9017c576bbebcf48f4aff66187ca4799f6d982af"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/eghojansu/php-event-dispatcher/zipball/9017c576bbebcf48f4aff66187ca4799f6d982af",
+                "reference": "9017c576bbebcf48f4aff66187ca4799f6d982af",
+                "shasum": ""
+            },
+            "require": {
+                "ekok/php-container": "dev-master",
+                "ekok/php-utils": "dev-master",
+                "php": ">=8.0"
+            },
+            "require-dev": {
+                "codeception/codeception": "~4.1",
+                "codeception/module-asserts": "^1.0.0",
+                "codeception/module-phpbrowser": "^1.0.0"
+            },
+            "default-branch": true,
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Ekok\\EventDispatcher\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Eko Kurniawan",
+                    "email": "setiawanegho@gmail.com"
+                }
+            ],
+            "description": "PHP Event Dispatcher",
+            "support": {
+                "issues": "https://github.com/eghojansu/php-event-dispatcher/issues",
+                "source": "https://github.com/eghojansu/php-event-dispatcher/tree/master"
+            },
+            "time": "2022-03-12T17:03:56+00:00"
+        },
         {
             "name": "ekok/php-logger",
             "version": "dev-master",
@@ -58,12 +153,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/eghojansu/php-utils.git",
-                "reference": "9d345d6f8acee89a7e7f9eb06d3930f1af5beb5a"
+                "reference": "4edc4d2914b0b65d891a1f690be95eb71bff534c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/eghojansu/php-utils/zipball/9d345d6f8acee89a7e7f9eb06d3930f1af5beb5a",
-                "reference": "9d345d6f8acee89a7e7f9eb06d3930f1af5beb5a",
+                "url": "https://api.github.com/repos/eghojansu/php-utils/zipball/4edc4d2914b0b65d891a1f690be95eb71bff534c",
+                "reference": "4edc4d2914b0b65d891a1f690be95eb71bff534c",
                 "shasum": ""
             },
             "require": {
@@ -96,7 +191,7 @@
                 "issues": "https://github.com/eghojansu/php-utils/issues",
                 "source": "https://github.com/eghojansu/php-utils/tree/master"
             },
-            "time": "2022-03-11T06:41:37+00:00"
+            "time": "2022-03-12T16:26:52+00:00"
         }
     ],
     "packages-dev": [
@@ -165,16 +260,16 @@
         },
         {
             "name": "codeception/codeception",
-            "version": "4.1.30",
+            "version": "4.1.31",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Codeception/Codeception.git",
-                "reference": "a035d77d070fa57fad438e07a65447aeca248c45"
+                "reference": "15524571ae0686a7facc2eb1f40f600e5bbce9e5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Codeception/Codeception/zipball/a035d77d070fa57fad438e07a65447aeca248c45",
-                "reference": "a035d77d070fa57fad438e07a65447aeca248c45",
+                "url": "https://api.github.com/repos/Codeception/Codeception/zipball/15524571ae0686a7facc2eb1f40f600e5bbce9e5",
+                "reference": "15524571ae0686a7facc2eb1f40f600e5bbce9e5",
                 "shasum": ""
             },
             "require": {
@@ -251,7 +346,7 @@
             ],
             "support": {
                 "issues": "https://github.com/Codeception/Codeception/issues",
-                "source": "https://github.com/Codeception/Codeception/tree/4.1.30"
+                "source": "https://github.com/Codeception/Codeception/tree/4.1.31"
             },
             "funding": [
                 {
@@ -259,7 +354,7 @@
                     "type": "open_collective"
                 }
             ],
-            "time": "2022-03-05T18:12:30+00:00"
+            "time": "2022-03-13T17:07:08+00:00"
         },
         {
             "name": "codeception/lib-asserts",
@@ -1745,16 +1840,16 @@
         },
         {
             "name": "phpunit/phpunit",
-            "version": "9.5.18",
+            "version": "9.5.19",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "1b5856028273bfd855e60a887278857d872ec67a"
+                "reference": "35ea4b7f3acabb26f4bb640f8c30866c401da807"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/1b5856028273bfd855e60a887278857d872ec67a",
-                "reference": "1b5856028273bfd855e60a887278857d872ec67a",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/35ea4b7f3acabb26f4bb640f8c30866c401da807",
+                "reference": "35ea4b7f3acabb26f4bb640f8c30866c401da807",
                 "shasum": ""
             },
             "require": {
@@ -1784,7 +1879,7 @@
                 "sebastian/global-state": "^5.0.1",
                 "sebastian/object-enumerator": "^4.0.3",
                 "sebastian/resource-operations": "^3.0.3",
-                "sebastian/type": "^2.3.4",
+                "sebastian/type": "^3.0",
                 "sebastian/version": "^3.0.2"
             },
             "require-dev": {
@@ -1832,7 +1927,7 @@
             ],
             "support": {
                 "issues": "https://github.com/sebastianbergmann/phpunit/issues",
-                "source": "https://github.com/sebastianbergmann/phpunit/tree/9.5.18"
+                "source": "https://github.com/sebastianbergmann/phpunit/tree/9.5.19"
             },
             "funding": [
                 {
@@ -1844,7 +1939,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2022-03-08T06:52:28+00:00"
+            "time": "2022-03-15T09:57:31+00:00"
         },
         {
             "name": "psr/container",
@@ -3010,28 +3105,28 @@
         },
         {
             "name": "sebastian/type",
-            "version": "2.3.4",
+            "version": "3.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/type.git",
-                "reference": "b8cd8a1c753c90bc1a0f5372170e3e489136f914"
+                "reference": "b233b84bc4465aff7b57cf1c4bc75c86d00d6dad"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/type/zipball/b8cd8a1c753c90bc1a0f5372170e3e489136f914",
-                "reference": "b8cd8a1c753c90bc1a0f5372170e3e489136f914",
+                "url": "https://api.github.com/repos/sebastianbergmann/type/zipball/b233b84bc4465aff7b57cf1c4bc75c86d00d6dad",
+                "reference": "b233b84bc4465aff7b57cf1c4bc75c86d00d6dad",
                 "shasum": ""
             },
             "require": {
                 "php": ">=7.3"
             },
             "require-dev": {
-                "phpunit/phpunit": "^9.3"
+                "phpunit/phpunit": "^9.5"
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "2.3-dev"
+                    "dev-master": "3.0-dev"
                 }
             },
             "autoload": {
@@ -3054,7 +3149,7 @@
             "homepage": "https://github.com/sebastianbergmann/type",
             "support": {
                 "issues": "https://github.com/sebastianbergmann/type/issues",
-                "source": "https://github.com/sebastianbergmann/type/tree/2.3.4"
+                "source": "https://github.com/sebastianbergmann/type/tree/3.0.0"
             },
             "funding": [
                 {
@@ -3062,7 +3157,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2021-06-15T12:49:02+00:00"
+            "time": "2022-03-15T09:54:48+00:00"
         },
         {
             "name": "sebastian/version",
@@ -4570,7 +4665,9 @@
     "minimum-stability": "stable",
     "stability-flags": {
         "ekok/php-utils": 20,
-        "ekok/php-logger": 20
+        "ekok/php-logger": 20,
+        "ekok/php-event-dispatcher": 20,
+        "ekok/php-container": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,
@@ -4578,5 +4675,5 @@
         "php": ">=8.0"
     },
     "platform-dev": [],
-    "plugin-api-version": "2.0.0"
+    "plugin-api-version": "2.1.0"
 }

@@ -62,13 +62,9 @@ class Connection
         $this->driver = strstr($dsn, ':', true);
         $this->name = self::parseDbName($dsn);
 
-        $this->setBuilder(new Builder(
-            $this->driver,
-            $this->options['table_prefix'],
-            $this->options['quotes'],
-            $this->options['raw_identifier'],
-            $this->options['format_query'],
-        ));
+        $this->setBuilder(new Builder($this->options + array(
+            'driver' => $this->driver,
+        )));
     }
 
     public function simplePaginate(string $table, int $page = 1, array|string $criteria = null, array $options = null): array
@@ -126,7 +122,7 @@ class Connection
 
     public function insert(string $table, array $data, array|string $options = null): bool|int|array|object|null
     {
-        list($sql, $values) = $this->builder->insert($table, $data);
+        list($sql, $values) = $this->builder->insert($table, $data, (array) $options);
 
         return $this->query($sql, $values, $query) ? (function () use ($query, $options, $table) {
             if (!$options || (is_array($options) && !($load = $options['load'] ?? null))) {
@@ -149,21 +145,21 @@ class Connection
 
     public function update(string $table, array $data, array|string $criteria, array|bool|null $options = false): bool|int|array|object|null
     {
-        list($sql, $values) = $this->builder->update($table, $data, $criteria);
+        list($sql, $values) = $this->builder->update($table, $data, $criteria, (array) $options);
 
         return $this->query($sql, $values, $query) ? (false === $options ? $query->rowCount() : $this->selectOne($table, $criteria, true === $options ? null : $options)) : false;
     }
 
-    public function delete(string $table, array|string $criteria): bool|int
+    public function delete(string $table, array|string $criteria, array $options = null): bool|int
     {
-        list($sql, $values) = $this->builder->delete($table, $criteria);
+        list($sql, $values) = $this->builder->delete($table, $criteria, $options);
 
         return $this->query($sql, $values, $query) ? $query->rowCount() : false;
     }
 
     public function insertBatch(string $table, array $data, array|string $criteria = null, array|string $options = null): bool|int|array|null
     {
-        list($sql, $values) = $this->builder->insertBatch($table, $data);
+        list($sql, $values) = $this->builder->insertBatch($table, $data, (array) $options);
 
         return $this->query($sql, $values, $query) ? ($criteria ? $this->select($table, $criteria, $options) : $query->rowCount()) : false;
     }

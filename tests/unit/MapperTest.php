@@ -17,7 +17,7 @@ class MapperTest extends \Codeception\Test\Unit
 
     protected function _before()
     {
-        $this->log = new Log(array('directory' => TEST_TMP));
+        $this->log = new Log(array('directory' => TEST_TMP, 'enabled' => true));
         $this->db = new Connection($this->log, 'sqlite::memory:', null, null, array(
             'scripts' => array(
                 <<<'SQL'
