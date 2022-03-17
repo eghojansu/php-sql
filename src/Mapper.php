@@ -480,7 +480,7 @@ class Mapper implements \ArrayAccess, \Iterator, \Countable, \JsonSerializable
         return Arr::each($row, fn($value, $key) => $this->castOut($key, $value));
     }
 
-    protected function castOut(string $column, string|null $var): \DateTime|string|int|float|array|bool|null
+    protected function castOut(string $column, string|float|int|null $var): \DateTime|string|int|float|array|bool|null
     {
         $cast = $this->casts[$column] ?? null;
 

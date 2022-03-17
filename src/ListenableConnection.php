@@ -5,21 +5,22 @@ declare(strict_types=1);
 namespace Ekok\Sql;
 
 use Ekok\Logger\Log;
+use Ekok\EventDispatcher\Event;
 use Ekok\EventDispatcher\Dispatcher;
-use Ekok\Sql\Event\AfterCount as AfterCountEvent;
-use Ekok\Sql\Event\AfterPaginate as AfterPaginateEvent;
-use Ekok\Sql\Event\AfterSelect as AfterSelectEvent;
-use Ekok\Sql\Event\AfterInsert as AfterInsertEvent;
-use Ekok\Sql\Event\AfterUpdate as AfterUpdateEvent;
-use Ekok\Sql\Event\AfterDelete as AfterDeleteEvent;
-use Ekok\Sql\Event\AfterInsertBatch as AfterInsertBatchEvent;
 use Ekok\Sql\Event\Count as CountEvent;
-use Ekok\Sql\Event\Paginate as PaginateEvent;
-use Ekok\Sql\Event\Select as SelectEvent;
-use Ekok\Sql\Event\Insert as InsertEvent;
-use Ekok\Sql\Event\Update as UpdateEvent;
 use Ekok\Sql\Event\Delete as DeleteEvent;
+use Ekok\Sql\Event\Insert as InsertEvent;
+use Ekok\Sql\Event\Select as SelectEvent;
+use Ekok\Sql\Event\Update as UpdateEvent;
+use Ekok\Sql\Event\Paginate as PaginateEvent;
+use Ekok\Sql\Event\AfterCount as AfterCountEvent;
+use Ekok\Sql\Event\AfterDelete as AfterDeleteEvent;
+use Ekok\Sql\Event\AfterInsert as AfterInsertEvent;
+use Ekok\Sql\Event\AfterSelect as AfterSelectEvent;
+use Ekok\Sql\Event\AfterUpdate as AfterUpdateEvent;
 use Ekok\Sql\Event\InsertBatch as InsertBatchEvent;
+use Ekok\Sql\Event\AfterPaginate as AfterPaginateEvent;
+use Ekok\Sql\Event\AfterInsertBatch as AfterInsertBatchEvent;
 
 class ListenableConnection extends Connection
 {
@@ -39,23 +40,23 @@ class ListenableConnection extends Connection
         $this->dispatcher = $dispatcher;
     }
 
-    public function on(string $eventName, callable|string $handler, int $priority = null): static
+    public function listen(string $eventName, callable|string $handler, int $priority = null, bool $once = false): static
     {
-        $this->dispatcher->on($eventName, $handler, $priority);
+        $this->dispatcher->on($eventName, $handler, $priority, $once);
 
         return $this;
     }
 
-    public function one(string $eventName, callable|string $handler, int $priority = null): static
-    {
-        $this->dispatcher->one($eventName, $handler, $priority);
-
-        return $this;
-    }
-
-    public function off(string $eventName, int $pos = null): static
+    public function unlisten(string $eventName, int $pos = null): static
     {
         $this->dispatcher->off($eventName, $pos);
+
+        return $this;
+    }
+
+    public function dispatch(Event $event, string $eventName = null, bool $once = false): static
+    {
+        $this->dispatcher->dispatch($event, $eventName, $once);
 
         return $this;
     }
@@ -66,7 +67,7 @@ class ListenableConnection extends Connection
             'root_event' => PaginateEvent::class,
         ) + ($options ?? array()));
 
-        $this->dispatcher->dispatch($event);
+        $this->dispatch($event);
 
         if ($event->isPropagationStopped()) {
             return $event->getResult() ?? array();
@@ -80,7 +81,7 @@ class ListenableConnection extends Connection
         );
         $event = new AfterPaginateEvent($event->getTable(), $result);
 
-        $this->dispatcher->dispatch($event);
+        $this->dispatch($event);
 
         return $event->getResult() ?? array();
     }
@@ -91,7 +92,7 @@ class ListenableConnection extends Connection
             'root_event' => CountEvent::class,
         ) + ($options ?? array()));
 
-        $this->dispatcher->dispatch($event);
+        $this->dispatch($event);
 
         if ($event->isPropagationStopped()) {
             return $event->getResult() ?? 0;
@@ -104,7 +105,7 @@ class ListenableConnection extends Connection
         );
         $event = new AfterCountEvent($event->getTable(), $result);
 
-        $this->dispatcher->dispatch($event);
+        $this->dispatch($event);
 
         return $event->getResult() ?? 0;
     }
@@ -113,7 +114,7 @@ class ListenableConnection extends Connection
     {
         $event = new SelectEvent($table, $criteria, $options, $options['root_event'] ?? null);
 
-        $this->dispatcher->dispatch($event);
+        $this->dispatch($event);
 
         if ($event->isPropagationStopped()) {
             return $event->getResult();
@@ -126,7 +127,7 @@ class ListenableConnection extends Connection
         );
         $event = new AfterSelectEvent($event->getTable(), $result, $options['root_event'] ?? null);
 
-        $this->dispatcher->dispatch($event);
+        $this->dispatch($event);
 
         return $event->getResult();
     }
@@ -135,7 +136,7 @@ class ListenableConnection extends Connection
     {
         $event = new InsertEvent($table, $data, $options, $options['root_event'] ?? null);
 
-        $this->dispatcher->dispatch($event);
+        $this->dispatch($event);
 
         if ($event->isPropagationStopped()) {
             return $event->getResult();
@@ -148,7 +149,7 @@ class ListenableConnection extends Connection
         );
         $event = new AfterInsertEvent($event->getTable(), $result, $options['root_event'] ?? null);
 
-        $this->dispatcher->dispatch($event);
+        $this->dispatch($event);
 
         return $event->getResult();
     }
@@ -157,7 +158,7 @@ class ListenableConnection extends Connection
     {
         $event = new UpdateEvent($table, $data, $criteria, $options, $options['root_event'] ?? null);
 
-        $this->dispatcher->dispatch($event);
+        $this->dispatch($event);
 
         if ($event->isPropagationStopped()) {
             return $event->getResult();
@@ -171,7 +172,7 @@ class ListenableConnection extends Connection
         );
         $event = new AfterUpdateEvent($event->getTable(), $result, $options['root_event'] ?? null);
 
-        $this->dispatcher->dispatch($event);
+        $this->dispatch($event);
 
         return $event->getResult();
     }
@@ -180,7 +181,7 @@ class ListenableConnection extends Connection
     {
         $event = new DeleteEvent($table, $criteria, array('root_event' => DeleteEvent::class) + ($options ?? array()));
 
-        $this->dispatcher->dispatch($event);
+        $this->dispatch($event);
 
         if ($event->isPropagationStopped()) {
             return $event->getResult();
@@ -193,7 +194,7 @@ class ListenableConnection extends Connection
         );
         $event = new AfterDeleteEvent($event->getTable(), $result);
 
-        $this->dispatcher->dispatch($event);
+        $this->dispatch($event);
 
         return $event->getResult();
     }
@@ -202,7 +203,7 @@ class ListenableConnection extends Connection
     {
         $event = new InsertBatchEvent($table, $data, $criteria, $options);
 
-        $this->dispatcher->dispatch($event);
+        $this->dispatch($event);
 
         if ($event->isPropagationStopped()) {
             return $event->getResult();
@@ -216,7 +217,7 @@ class ListenableConnection extends Connection
         );
         $event = new AfterInsertBatchEvent($event->getTable(), $result);
 
-        $this->dispatcher->dispatch($event);
+        $this->dispatch($event);
 
         return $event->getResult();
     }

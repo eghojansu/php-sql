@@ -24,6 +24,9 @@ class ListenableConnectionTest extends \Codeception\Test\Unit
     /** @var ListenableConnection */
     private $db;
 
+    /** @var Di */
+    private $di;
+
     /** @var Log */
     private $log;
 
@@ -32,8 +35,9 @@ class ListenableConnectionTest extends \Codeception\Test\Unit
 
     protected function _before()
     {
+        $this->di = new Di();
         $this->log = new Log(array('directory' => TEST_TMP));
-        $this->dispatcher = new Dispatcher(new Di());
+        $this->dispatcher = new Dispatcher($this->di);
         $this->db = new ListenableConnection(
             $this->dispatcher,
             $this->log,
@@ -50,25 +54,55 @@ SQL
                 ),
             ),
         );
+
+        $this->di->inject($this->db);
     }
 
     public function testEvents()
     {
-        $this->db->on(InsertEvent::class, function (InsertEvent $event) {
+        $this->db->listen('onInsert', function (InsertEvent $event) {
             $event->replaceData(array('name' => 'replaced'));
         });
-        $this->db->one(AfterInsertEvent::class, function (AfterInsertEvent $event) {
-            $event->setResult($event->getResult() + array('added' => true));
+        $this->db->listen('onAfterInsert', function (AfterInsertEvent $event) {
+            $event->setResult($event->getResult() + array('saved' => true));
+        });
+        $this->db->listen(SelectEvent::class, function (SelectEvent $event, ListenableConnection $db) {
+            $event->setCriteria(
+                $db->getBuilder()->criteriaMerge(
+                    $event->getCriteria(),
+                    'hint IS NULL',
+                ),
+            );
+        });
+        $this->db->listen(AfterSelectEvent::class, function (AfterSelectEvent $event) {
+            $result = $event->getResult();
+            $result[0]['loaded'] = true;
+
+            $event->setResult($result);
         });
 
         $expected = array(
             'id' => '1',
             'name' => 'replaced',
             'hint' => null,
-            'added' => true,
+            'saved' => true,
+            'loaded' => true,
         );
         $actual = $this->db->insert('demo', array('name' => 'foo'), 'id');
 
-        $this->assertSame($expected, $actual);
+        $this->assertEquals($expected, $actual);
+
+        $this->db->unlisten('onInsert');
+
+        $expected = array(
+            'id' => '2',
+            'name' => 'foo',
+            'hint' => null,
+            'saved' => true,
+            'loaded' => true,
+        );
+        $actual = $this->db->insert('demo', array('name' => 'foo'), 'id');
+
+        $this->assertEquals($expected, $actual);
     }
 }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Ekok\Sql\Event;
 
+use Ekok\Utils\Str;
 use Ekok\EventDispatcher\Event as EventBase;
 
 abstract class Event extends EventBase
@@ -18,6 +19,11 @@ abstract class Event extends EventBase
 
         $this->setTable($table);
         $this->setResult($result);
+    }
+
+    public function getName(): ?string
+    {
+        return 'on' . Str::className(static::class);
     }
 
     public function getRootEvent(): string

@@ -59,12 +59,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/eghojansu/php-event-dispatcher.git",
-                "reference": "9017c576bbebcf48f4aff66187ca4799f6d982af"
+                "reference": "f1d52394dfc770107d184fe2ea39385508ce3b0d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/eghojansu/php-event-dispatcher/zipball/9017c576bbebcf48f4aff66187ca4799f6d982af",
-                "reference": "9017c576bbebcf48f4aff66187ca4799f6d982af",
+                "url": "https://api.github.com/repos/eghojansu/php-event-dispatcher/zipball/f1d52394dfc770107d184fe2ea39385508ce3b0d",
+                "reference": "f1d52394dfc770107d184fe2ea39385508ce3b0d",
                 "shasum": ""
             },
             "require": {
@@ -99,7 +99,7 @@
                 "issues": "https://github.com/eghojansu/php-event-dispatcher/issues",
                 "source": "https://github.com/eghojansu/php-event-dispatcher/tree/master"
             },
-            "time": "2022-03-12T17:03:56+00:00"
+            "time": "2022-03-17T12:30:39+00:00"
         },
         {
             "name": "ekok/php-logger",
@@ -4675,5 +4675,5 @@
         "php": ">=8.0"
     },
     "platform-dev": [],
-    "plugin-api-version": "2.1.0"
+    "plugin-api-version": "2.2.0"
 }
