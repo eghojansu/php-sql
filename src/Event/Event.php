@@ -12,7 +12,7 @@ abstract class Event extends EventBase
     private $table;
     private $result;
 
-    public function __construct(string $table, array|int|object $result = null, string $rootEvent = null)
+    public function __construct(string $table, $result = null, string $rootEvent = null)
     {
         $this->rootEvent = $rootEvent;
 
@@ -42,12 +42,12 @@ abstract class Event extends EventBase
         return $this;
     }
 
-    public function getResult(): bool|int|array|object|null
+    public function getResult()
     {
         return $this->result;
     }
 
-    public function setResult(bool|int|array|object|null $result): static
+    public function setResult($result): static
     {
         $this->result = $result;
 

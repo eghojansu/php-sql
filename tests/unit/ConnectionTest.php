@@ -219,12 +219,14 @@ SQL
             'table_prefix' => null,
             'quotes' => null,
             'options' => null,
+            'driver' => 'sqlite',
             'scripts' => array(),
         );
         $actual = $this->db->getOptions();
         $actual['scripts'] = array();
 
         $this->assertEquals($expected, $actual);
+        $this->assertSame(30, $this->db->setOption('pagination_size', 30)->getOption('pagination_size'));
     }
 
     public function testMap()
@@ -284,9 +286,20 @@ SQL
 
     public function testDeleteWithPreviousRowReturn()
     {
-        $inserted = $this->db->insert('demo', array('name' => 'foo'), 'id');
+        $created = $this->db->insert('demo', array('name' => 'foo'), 'id');
         $deleted = $this->db->delete('demo', 'id=1', true);
 
-        $this->assertSame(array($inserted), $deleted);
+        $this->assertSame(array($created), $deleted);
+    }
+
+    public function testSave()
+    {
+        $created = $this->db->save('demo', array('name' => 'foo'), 'id=1', array('load' => 'id'));
+        $updated = $this->db->save('demo', array('name' => 'bar'), 'id=1', array('load' => 'id'));
+
+        $this->assertNotEquals($created, $updated);
+        $this->assertSame($updated['id'], $created['id']);
+        $this->assertSame('foo', $created['name']);
+        $this->assertSame('bar', $updated['name']);
     }
 }

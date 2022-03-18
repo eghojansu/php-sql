@@ -58,13 +58,10 @@ class Connection
         $this->dsn = $dsn;
         $this->username = $username;
         $this->password = $password;
-        $this->options = ($options ?? array()) + $this->options;
         $this->driver = strstr($dsn, ':', true);
         $this->name = self::parseDbName($dsn);
 
-        $this->setBuilder(new Builder($this->options + array(
-            'driver' => $this->driver,
-        )));
+        $this->setOptions($options ?? array());
     }
 
     public function simplePaginate(string $table, int $page = 1, array|string $criteria = null, array $options = null): array
@@ -99,15 +96,17 @@ class Connection
 
     public function count(string $table, array|string $criteria = null, array $options = null): int
     {
-        list($sql, $values) = $this->builder->select($table, $criteria, Arr::without($options, 'orders'));
-        list($sqlCount) = $this->builder->select($sql, null, array('sub' => true, 'alias' => '_c', 'columns' => array('_d' => $this->builder->raw('COUNT(*)'))));
+        $builder = $this->getBuilder();
+
+        list($sql, $values) = $builder->select($table, $criteria, Arr::without($options, 'orders'));
+        list($sqlCount) = $builder->select($sql, null, array('sub' => true, 'alias' => '_c', 'columns' => array('_d' => $builder->raw('COUNT(*)'))));
 
         return $this->query($sqlCount, $values, $query) ? intval($query->fetchColumn(0)) : 0;
     }
 
     public function select(string $table, array|string $criteria = null, array $options = null): array|null
     {
-        list($sql, $values) = $this->builder->select($table, $criteria, $options);
+        list($sql, $values) = $this->getBuilder()->select($table, $criteria, $options);
 
         $args = $options['fetch_args'] ?? array();
         $fetch = $options['fetch'] ?? \PDO::FETCH_ASSOC;
@@ -120,9 +119,18 @@ class Connection
         return $this->select($table, $criteria, Arr::merge($options, array('limit' => 1)))[0] ?? null;
     }
 
+    public function save(string $table, array $data, array|string $criteria = null, array|bool|null $options = false): bool|int|array|object|null
+    {
+        if ($criteria && $this->selectOne($table, $criteria, (array) $options)) {
+            return $this->update($table, $data, $criteria, $options);
+        }
+
+        return $this->insert($table, $data, is_bool($options) ? null : $options);
+    }
+
     public function insert(string $table, array $data, array|string $options = null): bool|int|array|object|null
     {
-        list($sql, $values) = $this->builder->insert($table, $data, (array) $options);
+        list($sql, $values) = $this->getBuilder()->insert($table, $data, (array) $options);
 
         return $this->query($sql, $values, $query) ? (function () use ($query, $options, $table) {
             if (!$options || (is_array($options) && !($load = $options['load'] ?? null))) {
@@ -145,23 +153,23 @@ class Connection
 
     public function update(string $table, array $data, array|string $criteria, array|bool|null $options = false): bool|int|array|object|null
     {
-        list($sql, $values) = $this->builder->update($table, $data, $criteria, (array) $options);
+        list($sql, $values) = $this->getBuilder()->update($table, $data, $criteria, (array) $options);
 
         return $this->query($sql, $values, $query) ? (false === $options ? $query->rowCount() : $this->selectOne($table, $criteria, true === $options ? null : $options)) : false;
     }
 
-    public function delete(string $table, array|string $criteria, array|bool|null $options = null): bool|int|array|object
+    public function delete(string $table, array|string $criteria, array|bool|null $options = null): bool|int|array|object|null
     {
         $result = true === $options || true === ($options['load'] ?? false) ? $this->select($table, $criteria, (array) $options) : null;
 
-        list($sql, $values) = $this->builder->delete($table, $criteria, (array) $options);
+        list($sql, $values) = $this->getBuilder()->delete($table, $criteria, (array) $options);
 
         return $this->query($sql, $values, $query) ? ($result ?? $query->rowCount()) : false;
     }
 
     public function insertBatch(string $table, array $data, array|string $criteria = null, array|string $options = null): bool|int|array|null
     {
-        list($sql, $values) = $this->builder->insertBatch($table, $data, (array) $options);
+        list($sql, $values) = $this->getBuilder()->insertBatch($table, $data, (array) $options);
 
         return $this->query($sql, $values, $query) ? ($criteria ? $this->select($table, $criteria, $options) : $query->rowCount()) : false;
     }
@@ -218,7 +226,7 @@ class Connection
         $mode = $pdo->getAttribute(\PDO::ATTR_ERRMODE);
         $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_SILENT);
 
-        $out = $pdo->query('SELECT 1 FROM ' . $this->builder->table($table) . ' LIMIT 1');
+        $out = $pdo->query('SELECT 1 FROM ' . $this->getBuilder()->table($table) . ' LIMIT 1');
         $pdo->setAttribute(\PDO::ATTR_ERRMODE, $mode);
 
         return !!$out;
@@ -226,7 +234,7 @@ class Connection
 
     public function getBuilder(): Builder
     {
-        return $this->builder;
+        return $this->builder ?? $this->setBuilder(new Builder($this->options))->builder;
     }
 
     public function setBuilder(Builder $builder): static
@@ -280,9 +288,28 @@ class Connection
         return $text;
     }
 
+    public function getOption(string $name)
+    {
+        return $this->options[$name] ?? null;
+    }
+
+    public function setOption(string $name, $value): static
+    {
+        $this->options[$name] = $value;
+
+        return $this;
+    }
+
     public function getOptions(): array
     {
         return $this->options;
+    }
+
+    public function setOptions(array $options): static
+    {
+        $this->options = $options + $this->options + array('driver' => $this->driver);
+
+        return $this;
     }
 
     public function getVersion(): string
