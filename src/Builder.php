@@ -297,7 +297,7 @@ class Builder
                 $values[] = $value;
             });
 
-            $line = $tmp;
+            $line = $tmp ?? '';
         }
 
         if ($line) {

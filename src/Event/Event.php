@@ -11,7 +11,6 @@ abstract class Event extends EventBase
 {
     private $table;
     private $result;
-    private $rootEvent;
 
     public function __construct(string $table, array|int|object $result = null, string $rootEvent = null)
     {
@@ -26,9 +25,9 @@ abstract class Event extends EventBase
         return 'on' . Str::className(static::class);
     }
 
-    public function getRootEvent(): string
+    public function getRootEvent(): string|null
     {
-        return $this->rootEvent ?? static::class;
+        return $this->rootEvent;
     }
 
     public function getTable(): string
@@ -53,12 +52,5 @@ abstract class Event extends EventBase
         $this->result = $result;
 
         return $this;
-    }
-
-    public function getResultAs(string $type, $default = null)
-    {
-        $isType = 'is_' . $type;
-
-        return $isType($this->result) ? $this->result : $default;
     }
 }

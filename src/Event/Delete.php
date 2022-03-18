@@ -11,8 +11,8 @@ class Delete extends Event
 
     public function __construct(
         string $table,
-        array $criteria = null,
-        array $options = null,
+        array|string $criteria = null,
+        array|bool|null $options = null,
         string $rootEvent = null,
     ) {
         parent::__construct($table, null, $rootEvent);

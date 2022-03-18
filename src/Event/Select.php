@@ -15,7 +15,7 @@ class Select extends Event
         array $options = null,
         string $rootEvent = null,
     ) {
-        parent::__construct($table, $rootEvent);
+        parent::__construct($table, null, $rootEvent);
 
         $this->setCriteria($criteria);
         $this->setOptions($options);

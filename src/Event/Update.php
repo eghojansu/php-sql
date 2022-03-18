@@ -11,7 +11,7 @@ class Update extends Insert
     public function __construct(
         string $table,
         array $data = null,
-        array $criteria = null,
+        array|string $criteria = null,
         array|bool $options = null,
         string $rootEvent = null,
     ) {

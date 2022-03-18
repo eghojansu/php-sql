@@ -281,4 +281,12 @@ SQL
             ),
         );
     }
+
+    public function testDeleteWithPreviousRowReturn()
+    {
+        $inserted = $this->db->insert('demo', array('name' => 'foo'), 'id');
+        $deleted = $this->db->delete('demo', 'id=1', true);
+
+        $this->assertSame(array($inserted), $deleted);
+    }
 }

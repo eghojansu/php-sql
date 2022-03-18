@@ -150,11 +150,13 @@ class Connection
         return $this->query($sql, $values, $query) ? (false === $options ? $query->rowCount() : $this->selectOne($table, $criteria, true === $options ? null : $options)) : false;
     }
 
-    public function delete(string $table, array|string $criteria, array $options = null): bool|int
+    public function delete(string $table, array|string $criteria, array|bool|null $options = null): bool|int|array|object
     {
-        list($sql, $values) = $this->builder->delete($table, $criteria, $options);
+        $result = true === $options || true === ($options['load'] ?? false) ? $this->select($table, $criteria, (array) $options) : null;
 
-        return $this->query($sql, $values, $query) ? $query->rowCount() : false;
+        list($sql, $values) = $this->builder->delete($table, $criteria, (array) $options);
+
+        return $this->query($sql, $values, $query) ? ($result ?? $query->rowCount()) : false;
     }
 
     public function insertBatch(string $table, array $data, array|string $criteria = null, array|string $options = null): bool|int|array|null

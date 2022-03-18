@@ -177,9 +177,11 @@ class ListenableConnection extends Connection
         return $event->getResult();
     }
 
-    public function delete(string $table, array|string $criteria, array $options = null): bool|int
+    public function delete(string $table, array|string $criteria, array|bool|null $options = null): bool|int|array|object
     {
-        $event = new DeleteEvent($table, $criteria, array('root_event' => DeleteEvent::class) + ($options ?? array()));
+        $options_ = is_bool($options) ? array('load' => $options) : (array) $options;
+        $options_['root_event'] = DeleteEvent::class;
+        $event = new DeleteEvent($table, $criteria, $options_);
 
         $this->dispatch($event);
 
