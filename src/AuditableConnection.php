@@ -6,14 +6,14 @@ namespace Ekok\Sql;
 
 class AuditableConnection extends ListenableConnection
 {
-    public function isEnabled(): bool
+    public function isEnable(): bool
     {
-        return $this->getOption('enabled') ?? true;
+        return $this->getOption('enable') ?? true;
     }
 
-    public function setEnabled(bool $enabled): static
+    public function setEnable(bool $enable): static
     {
-        $this->setOption('enabled', $enabled);
+        $this->setOption('enable', $enable);
 
         return $this;
     }
@@ -72,7 +72,7 @@ class AuditableConnection extends ListenableConnection
     {
         $useCriteria = $criteria;
 
-        if ($this->isEnabled() && ($options['ignore_deleted'] ?? true) && ($deleted = $this->getDeletedAtColumn())) {
+        if ($this->isEnable() && ($options['ignore_deleted'] ?? true) && ($deleted = $this->getDeletedAtColumn())) {
             $builder = $this->getBuilder();
             $useCriteria = $builder->criteriaMerge(
                 $useCriteria,
@@ -88,7 +88,7 @@ class AuditableConnection extends ListenableConnection
         $useData = $data;
 
         if (
-            $this->isEnabled()
+            $this->isEnable()
             && ($createdAt = $this->getCreatedAtColumn())
             && empty($useData[$createdAt])
         ) {
@@ -100,7 +100,7 @@ class AuditableConnection extends ListenableConnection
         }
 
         if (
-            $this->isEnabled()
+            $this->isEnable()
             && ($createdBy = $this->getCreatedByColumn())
             && empty($useData[$createdBy])
             && ($by = $this->getBlameToIdentifier())
@@ -120,14 +120,14 @@ class AuditableConnection extends ListenableConnection
         $useData = $data;
 
         if (
-            $this->isEnabled()
+            $this->isEnable()
             && ($updatedAt = $this->getUpdatedAtColumn())
         ) {
             $useData[$updatedAt] = $this->getTimestamp();
         }
 
         if (
-            $this->isEnabled()
+            $this->isEnable()
             && ($updatedBy = $this->getUpdatedByColumn())
             && ($by = $this->getBlameToIdentifier())
         ) {
@@ -139,7 +139,7 @@ class AuditableConnection extends ListenableConnection
 
     public function delete(string $table, array|string $criteria, array|bool|null $options = null): bool|int|array|object|null
     {
-        $update = $this->isEnabled() && !($options['force_delete'] ?? false) ? array() : null;
+        $update = $this->isEnable() && !($options['force_delete'] ?? false) ? array() : null;
 
         if (null !== $update && ($deletedAt = $this->getDeletedAtColumn())) {
             $update[$deletedAt] = $this->getTimestamp();
@@ -174,7 +174,7 @@ class AuditableConnection extends ListenableConnection
     public function insertBatch(string $table, array $data, array|string $criteria = null, array|string $options = null): bool|int|array|null
     {
         $useData = $data;
-        $add = $this->isEnabled() ? array() : null;
+        $add = $this->isEnable() ? array() : null;
 
         if (null !== $add && ($createdAt = $this->getCreatedAtColumn())) {
             $add[$createdAt] = $this->getTimestamp();

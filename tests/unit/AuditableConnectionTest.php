@@ -73,25 +73,25 @@ SQL
         );
         $actual = $this->db->insert('demo', array('name' => 'foo'), 'id');
 
-        $this->assertSame($expected, $actual);
+        $this->assertEquals($expected, $actual);
 
         $expected['name'] = 'update';
         $actual = $this->db->update('demo', array('name' => 'update'), 'id=1', true);
 
-        $this->assertSame($expected, $actual);
+        $this->assertEquals($expected, $actual);
 
         $expected['deleted_at'] = $this->now;
         $expected['deleted_by'] = $this->blameTo;
         $actual = $this->db->delete('demo', 'id=1', true);
 
-        $this->assertSame($expected, $actual);
+        $this->assertEquals($expected, $actual);
 
-        $this->assertSame(array($expected), $this->db->selectWithTrashed('demo'));
+        $this->assertEquals(array($expected), $this->db->selectWithTrashed('demo'));
 
         $expected = 1;
         $actual = $this->db->forceDelete('demo', 'id=1');
 
-        $this->assertSame($expected, $actual);
+        $this->assertEquals($expected, $actual);
 
         $expected = array(
             'id' => '2',
@@ -108,7 +108,7 @@ SQL
             array('name' => 'foo'),
         ), 'id=2');
 
-        $this->assertSame(array($expected), $actual);
+        $this->assertEquals(array($expected), $actual);
     }
 
     public function testDisable()
@@ -124,11 +124,11 @@ SQL
             'updated_by' => null,
             'deleted_by' => null,
         );
-        $this->db->setEnabled(false);
+        $this->db->setEnable(false);
 
         $actual = $this->db->insert('demo', array('name' => 'foo'), 'id');
 
-        $this->assertSame($expected, $actual);
+        $this->assertEquals($expected, $actual);
     }
 
     public function testWithCurrentDate()
