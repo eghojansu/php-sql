@@ -3,7 +3,6 @@
     "description": "PHP SQL Utility",
     "type": "library",
     "license": "MIT",
-    "minimum-stability": "stable",
     "authors": [
         {
             "name": "Eko Kurniawan",
@@ -20,14 +19,13 @@
     },
     "require": {
         "php": ">=8.0",
-        "ekok/php-utils": "dev-master",
-        "ekok/php-logger": "dev-master",
-        "ekok/php-event-dispatcher": "dev-master"
+        "ekok/php-utils": "^0",
+        "ekok/php-logger": "^0",
+        "ekok/php-event-dispatcher": "^0"
     },
     "require-dev": {
         "codeception/codeception": "~4.1",
         "codeception/module-phpbrowser": "^1.0.0",
-        "codeception/module-asserts": "^1.0.0",
-        "ekok/php-container": "dev-master"
+        "codeception/module-asserts": "^1.0.0"
     }
 }
