@@ -314,7 +314,7 @@ class Builder
         }
 
         return ($add ?? 'ORDER BY ') . implode(
-            $separator ?? ' ',
+            ',' . ($separator ?? ' '),
             Arr::each(
                 (array) $orders,
                 fn (string|null $column, string|int $key) => match(true) {
