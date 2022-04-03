@@ -248,7 +248,6 @@ SQL
         $this->assertInstanceOf(UserMap::class, $user);
         $this->assertCount(0, $user);
         $this->assertSame('user_map', $user->table());
-        define('x', 1);
         $this->assertTrue($user->fromArray(UserMap::generateRow('foo'))->save());
         $this->assertTrue($user->valid());
         $this->assertCount(1, $user);
@@ -301,5 +300,61 @@ SQL
         $this->assertSame($updated['id'], $created['id']);
         $this->assertSame('foo', $created['name']);
         $this->assertSame('bar', $updated['name']);
+    }
+
+    public function testChain()
+    {
+        $expected = 3;
+        $actual = $this->db->chain(
+            0,
+            static fn (Connection $db, $result) => $result + $db->insert('demo', array(
+                'name' => 'foo',
+            )),
+            static fn (Connection $db, $result) => $result + $db->insert('demo', array(
+                'name' => 'bar',
+            )),
+            static fn (Connection $db, $result) => $result + $db->insert('demo', array(
+                'name' => 'baz',
+            )),
+        );
+
+        $this->assertSame($expected, $actual);
+    }
+
+    public function testInsert()
+    {
+        $expected = 1;
+        $actual = $this->db->insert('demo', array('name' => 'row 1'));
+
+        $this->assertEquals($expected, $actual);
+
+        $expected = array(
+            'id' => 2,
+            'name' => 'row 2',
+            'hint' => null,
+        );
+        $actual = $this->db->insert('demo', array('name' => 'row 2'), array(
+            'load' => array("name = 'row 2' and id = ?"),
+        ));
+
+        $this->assertEquals($expected, $actual);
+
+        $expected = array(
+            'id' => 3,
+            'name' => 'row 3',
+            'hint' => null,
+        );
+        $actual = $this->db->insert('demo', array('name' => 'row 3'), 'id');
+
+        $this->assertEquals($expected, $actual);
+
+        $expected = array(
+            'id' => 50,
+            'name' => 'row 50',
+            'hint' => null,
+        );
+        $actual = $this->db->insert('demo', array('id' => 50, 'name' => 'row 50'), 'id');
+
+        $this->assertEquals($expected, $actual);
     }
 }

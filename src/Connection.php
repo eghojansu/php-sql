@@ -132,23 +132,32 @@ class Connection
     {
         list($sql, $values) = $this->getBuilder()->insert($table, $data, (array) $options);
 
-        return $this->query($sql, $values, $query) ? (function () use ($query, $options, $table) {
-            if (!$options || (is_array($options) && !($load = $options['load'] ?? null))) {
-                return $query->rowCount();
-            }
+        $saved = $this->query($sql, $values, $query);
 
-            if (isset($load)) {
-                $loadOptions = $options;
-            } else {
-                $loadOptions = null;
-                $load = $options;
-            }
+        if (!$saved) {
+            return false;
+        }
 
-            $criteria = is_string($load) ? array($load . ' = ?') : (array) $load;
-            $criteria[] = $this->getPdo()->lastInsertId();
+        if (!$options || (is_array($options) && !($load = $options['load'] ?? null))) {
+            return $query->rowCount();
+        }
 
-            return $this->selectOne($table, $criteria, $loadOptions);
-        })() : false;
+        if (isset($load)) {
+            $loadOptions = $options;
+        } else {
+            $loadOptions = null;
+            $load = $options;
+        }
+
+        $criteria = is_string($load) ? array(
+            $load . ' = ?',
+            $data[$load] ?? $this->getPdo()->lastInsertId(),
+        ) : array_merge(
+            $load,
+            array($this->getPdo()->lastInsertId()),
+        );
+
+        return $this->selectOne($table, $criteria, $loadOptions);
     }
 
     public function update(string $table, array $data, array|string $criteria, array|bool|null $options = false): bool|int|array|object|null
@@ -213,6 +222,15 @@ class Connection
         }
 
         return $result;
+    }
+
+    public function chain($carry, \Closure ...$callbacks)
+    {
+        return array_reduce(
+            $callbacks,
+            fn ($result, $cb) => false === $result ? false : $cb($this, $result),
+            $carry,
+        );
     }
 
     public function lastId(string $name = null): string|false
