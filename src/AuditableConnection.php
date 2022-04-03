@@ -76,7 +76,7 @@ class AuditableConnection extends ListenableConnection
             $builder = $this->getBuilder();
             $useCriteria = $builder->criteriaMerge(
                 $useCriteria,
-                $deleted . ' IS NULL',
+                $builder->column($deleted, $options['alias'] ?? $table) . ' IS NULL',
             );
         }
 
