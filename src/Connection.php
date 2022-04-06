@@ -79,7 +79,7 @@ class Connection
         $empty = false;
 
         if ($options['full'] ?? true) {
-            $total = $this->count($table, $criteria, Arr::without($options, 'limit'));
+            $total = $this->count($table, $criteria, Arr::ignore($options, 'limit'));
             $empty = $total === 0;
             $last_page = intval(ceil($total / $per_page));
         }
@@ -98,7 +98,7 @@ class Connection
     {
         $builder = $this->getBuilder();
 
-        list($sql, $values) = $builder->select($table, $criteria, Arr::without($options, 'orders'));
+        list($sql, $values) = $builder->select($table, $criteria, Arr::ignore($options, 'orders'));
         list($sqlCount) = $builder->select($sql, null, array('sub' => true, 'alias' => '_c', 'columns' => array('_d' => $builder->raw('COUNT(*)'))));
 
         return $this->query($sqlCount, $values, $query) ? intval($query->fetchColumn(0)) : 0;

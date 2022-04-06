@@ -19,9 +19,9 @@
     },
     "require": {
         "php": ">=8.0",
-        "ekok/php-utils": "^0",
-        "ekok/php-logger": "^0",
-        "ekok/php-event-dispatcher": "^0"
+        "ekok/php-utils": "^0.2",
+        "ekok/php-logger": "^0.1",
+        "ekok/php-event-dispatcher": "^0.1"
     },
     "require-dev": {
         "codeception/codeception": "~4.1",

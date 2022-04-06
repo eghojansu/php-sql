@@ -4,24 +4,24 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "7be81d94f08f688e0ddd54d5d5d62779",
+    "content-hash": "cc0d6d8b0e4997560c685afe667e64c8",
     "packages": [
         {
             "name": "ekok/php-container",
-            "version": "v0.2.0",
+            "version": "v0.2.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/eghojansu/php-container.git",
-                "reference": "ca2dafbbafe5c1c80c8d003ead6f5c3a1bb0ab0d"
+                "reference": "a2be435708d093921f182d8443def5dbf3fc7dc2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/eghojansu/php-container/zipball/ca2dafbbafe5c1c80c8d003ead6f5c3a1bb0ab0d",
-                "reference": "ca2dafbbafe5c1c80c8d003ead6f5c3a1bb0ab0d",
+                "url": "https://api.github.com/repos/eghojansu/php-container/zipball/a2be435708d093921f182d8443def5dbf3fc7dc2",
+                "reference": "a2be435708d093921f182d8443def5dbf3fc7dc2",
                 "shasum": ""
             },
             "require": {
-                "ekok/php-utils": "^0",
+                "ekok/php-utils": "^0.2",
                 "php": ">=8.0"
             },
             "require-dev": {
@@ -48,26 +48,26 @@
             "description": "PHP Container",
             "support": {
                 "issues": "https://github.com/eghojansu/php-container/issues",
-                "source": "https://github.com/eghojansu/php-container/tree/v0.2.0"
+                "source": "https://github.com/eghojansu/php-container/tree/v0.2.2"
             },
-            "time": "2022-03-28T14:41:26+00:00"
+            "time": "2022-04-06T05:14:41+00:00"
         },
         {
             "name": "ekok/php-event-dispatcher",
-            "version": "v0.1.0",
+            "version": "v0.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/eghojansu/php-event-dispatcher.git",
-                "reference": "42ad0fd934235f757ebdc9e7dd0b034def7a1b64"
+                "reference": "84eebcc02516408d5e5cfb95a3f28b065a02c889"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/eghojansu/php-event-dispatcher/zipball/42ad0fd934235f757ebdc9e7dd0b034def7a1b64",
-                "reference": "42ad0fd934235f757ebdc9e7dd0b034def7a1b64",
+                "url": "https://api.github.com/repos/eghojansu/php-event-dispatcher/zipball/84eebcc02516408d5e5cfb95a3f28b065a02c889",
+                "reference": "84eebcc02516408d5e5cfb95a3f28b065a02c889",
                 "shasum": ""
             },
             "require": {
-                "ekok/php-container": "^0",
+                "ekok/php-container": "^0.2",
                 "php": ">=8.0"
             },
             "require-dev": {
@@ -94,9 +94,9 @@
             "description": "PHP Event Dispatcher",
             "support": {
                 "issues": "https://github.com/eghojansu/php-event-dispatcher/issues",
-                "source": "https://github.com/eghojansu/php-event-dispatcher/tree/v0.1.0"
+                "source": "https://github.com/eghojansu/php-event-dispatcher/tree/v0.1.1"
             },
-            "time": "2022-03-27T08:01:17+00:00"
+            "time": "2022-04-06T04:39:23+00:00"
         },
         {
             "name": "ekok/php-logger",
@@ -145,16 +145,16 @@
         },
         {
             "name": "ekok/php-utils",
-            "version": "v0.1.0",
+            "version": "v0.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/eghojansu/php-utils.git",
-                "reference": "aecbbdcb51e804f26d5f3fdd6aae598c9d82b7a5"
+                "reference": "d2659acc18ebf4a68b11dba5ee4c7af935020011"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/eghojansu/php-utils/zipball/aecbbdcb51e804f26d5f3fdd6aae598c9d82b7a5",
-                "reference": "aecbbdcb51e804f26d5f3fdd6aae598c9d82b7a5",
+                "url": "https://api.github.com/repos/eghojansu/php-utils/zipball/d2659acc18ebf4a68b11dba5ee4c7af935020011",
+                "reference": "d2659acc18ebf4a68b11dba5ee4c7af935020011",
                 "shasum": ""
             },
             "require": {
@@ -184,9 +184,9 @@
             "description": "PHP Utilities",
             "support": {
                 "issues": "https://github.com/eghojansu/php-utils/issues",
-                "source": "https://github.com/eghojansu/php-utils/tree/v0.1.0"
+                "source": "https://github.com/eghojansu/php-utils/tree/v0.2.0"
             },
-            "time": "2022-03-27T07:47:25+00:00"
+            "time": "2022-04-06T01:49:59+00:00"
         }
     ],
     "packages-dev": [
@@ -2609,16 +2609,16 @@
         },
         {
             "name": "sebastian/environment",
-            "version": "5.1.3",
+            "version": "5.1.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/environment.git",
-                "reference": "388b6ced16caa751030f6a69e588299fa09200ac"
+                "reference": "1b5dff7bb151a4db11d49d90e5408e4e938270f7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/environment/zipball/388b6ced16caa751030f6a69e588299fa09200ac",
-                "reference": "388b6ced16caa751030f6a69e588299fa09200ac",
+                "url": "https://api.github.com/repos/sebastianbergmann/environment/zipball/1b5dff7bb151a4db11d49d90e5408e4e938270f7",
+                "reference": "1b5dff7bb151a4db11d49d90e5408e4e938270f7",
                 "shasum": ""
             },
             "require": {
@@ -2660,7 +2660,7 @@
             ],
             "support": {
                 "issues": "https://github.com/sebastianbergmann/environment/issues",
-                "source": "https://github.com/sebastianbergmann/environment/tree/5.1.3"
+                "source": "https://github.com/sebastianbergmann/environment/tree/5.1.4"
             },
             "funding": [
                 {
@@ -2668,7 +2668,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2020-09-28T05:52:38+00:00"
+            "time": "2022-04-03T09:37:03+00:00"
         },
         {
             "name": "sebastian/exporter",
@@ -3446,16 +3446,16 @@
         },
         {
             "name": "symfony/deprecation-contracts",
-            "version": "v3.0.0",
+            "version": "v3.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/deprecation-contracts.git",
-                "reference": "c726b64c1ccfe2896cb7df2e1331c357ad1c8ced"
+                "reference": "26954b3d62a6c5fd0ea8a2a00c0353a14978d05c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/deprecation-contracts/zipball/c726b64c1ccfe2896cb7df2e1331c357ad1c8ced",
-                "reference": "c726b64c1ccfe2896cb7df2e1331c357ad1c8ced",
+                "url": "https://api.github.com/repos/symfony/deprecation-contracts/zipball/26954b3d62a6c5fd0ea8a2a00c0353a14978d05c",
+                "reference": "26954b3d62a6c5fd0ea8a2a00c0353a14978d05c",
                 "shasum": ""
             },
             "require": {
@@ -3493,7 +3493,7 @@
             "description": "A generic function and convention to trigger deprecation notices",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/deprecation-contracts/tree/v3.0.0"
+                "source": "https://github.com/symfony/deprecation-contracts/tree/v3.0.1"
             },
             "funding": [
                 {
@@ -3509,7 +3509,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-11-01T23:48:49+00:00"
+            "time": "2022-01-02T09:55:41+00:00"
         },
         {
             "name": "symfony/dom-crawler",
@@ -3673,16 +3673,16 @@
         },
         {
             "name": "symfony/event-dispatcher-contracts",
-            "version": "v3.0.0",
+            "version": "v3.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/event-dispatcher-contracts.git",
-                "reference": "aa5422287b75594b90ee9cd807caf8f0df491385"
+                "reference": "7bc61cc2db649b4637d331240c5346dcc7708051"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/event-dispatcher-contracts/zipball/aa5422287b75594b90ee9cd807caf8f0df491385",
-                "reference": "aa5422287b75594b90ee9cd807caf8f0df491385",
+                "url": "https://api.github.com/repos/symfony/event-dispatcher-contracts/zipball/7bc61cc2db649b4637d331240c5346dcc7708051",
+                "reference": "7bc61cc2db649b4637d331240c5346dcc7708051",
                 "shasum": ""
             },
             "require": {
@@ -3732,7 +3732,7 @@
                 "standards"
             ],
             "support": {
-                "source": "https://github.com/symfony/event-dispatcher-contracts/tree/v3.0.0"
+                "source": "https://github.com/symfony/event-dispatcher-contracts/tree/v3.0.1"
             },
             "funding": [
                 {
@@ -3748,7 +3748,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-07-15T12:33:35+00:00"
+            "time": "2022-01-02T09:55:41+00:00"
         },
         {
             "name": "symfony/finder",
@@ -4307,16 +4307,16 @@
         },
         {
             "name": "symfony/service-contracts",
-            "version": "v3.0.0",
+            "version": "v3.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/service-contracts.git",
-                "reference": "36715ebf9fb9db73db0cb24263c79077c6fe8603"
+                "reference": "e517458f278c2131ca9f262f8fbaf01410f2c65c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/service-contracts/zipball/36715ebf9fb9db73db0cb24263c79077c6fe8603",
-                "reference": "36715ebf9fb9db73db0cb24263c79077c6fe8603",
+                "url": "https://api.github.com/repos/symfony/service-contracts/zipball/e517458f278c2131ca9f262f8fbaf01410f2c65c",
+                "reference": "e517458f278c2131ca9f262f8fbaf01410f2c65c",
                 "shasum": ""
             },
             "require": {
@@ -4369,7 +4369,7 @@
                 "standards"
             ],
             "support": {
-                "source": "https://github.com/symfony/service-contracts/tree/v3.0.0"
+                "source": "https://github.com/symfony/service-contracts/tree/v3.0.1"
             },
             "funding": [
                 {
@@ -4385,7 +4385,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-11-04T17:53:12+00:00"
+            "time": "2022-03-13T20:10:05+00:00"
         },
         {
             "name": "symfony/string",
