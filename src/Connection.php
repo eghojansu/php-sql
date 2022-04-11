@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace Ekok\Sql;
 
 use Ekok\Utils\Arr;
+use Ekok\Utils\Str;
 use Ekok\Logger\Log;
+use Ekok\Utils\Time;
 
 /**
  * PDO Sql Connection Wrapper
@@ -42,6 +44,7 @@ class Connection
         'format_query' => null,
         'raw_identifier' => null,
         'table_prefix' => null,
+        'debug' => false,
         'quotes' => null,
         'scripts' => null,
         'options' => null,
@@ -185,19 +188,37 @@ class Connection
 
     public function query(string $sql, array $values = null, \PDOStatement &$query = null): bool
     {
+        $mark = Time::mark();
+        $log = 'Running query';
+        $trace = null;
+        $result = false;
+
         try {
             $query = $this->getPdo()->prepare($sql);
             $success = $query ? $query->execute($values) : false;
-
-            return $success && '00000' === $query->errorCode();
+            $result = $success && '00000' === $query->errorCode();
         } catch (\Throwable $error) {
-            $this->log->log(Log::LEVEL_ERROR, $error->getMessage(), compact('sql', 'values') + array(
-                'query' => $this->stringify($sql, $values),
-                'trace' => Arr::formatTrace($error),
-            ));
-
-            return false;
+            $log = 'Query error: ' . $error->getMessage();
+            $trace = $error->getTrace();
         }
+
+        if ($this->isDebug()) {
+            $this->log->log(Log::LEVEL_DEBUG, $log, array(
+                'elapsed' => Time::elapsed($mark),
+                'success' => $result,
+                'sql' => $sql,
+                'values' => $values,
+                'query' => $this->stringify($sql, $values),
+                'trace' => Arr::formatTrace($trace),
+            ));
+        } elseif ($trace) {
+            $this->log->log(Log::LEVEL_ERROR, $log, array(
+                'query' => Str::limit($sql),
+                'trace' => Arr::formatTrace($trace),
+            ));
+        }
+
+        return $result;
     }
 
     public function exec(string $sql, array $values = null): int
@@ -205,7 +226,12 @@ class Connection
         return $this->query($sql, $values, $query) ? $query->rowCount() : 0;
     }
 
-    public function transact(\Closure $fn)
+    public function execRaw(string $sql): int|bool
+    {
+        return $this->getPdo()->exec($sql);
+    }
+
+    public function transact($carry, \Closure ...$callbacks)
     {
         $pdo = $this->getPdo();
 
@@ -213,7 +239,11 @@ class Connection
             $pdo->beginTransaction();
         }
 
-        $result = $fn($this);
+        $result = array_reduce(
+            $callbacks,
+            fn ($result, $cb) => false === $result ? false : $cb($this, $result),
+            $carry,
+        );
 
         if ($auto) {
             $endTransaction = '00000' === $pdo->errorCode() ? 'commit' : 'rollBack';
@@ -222,15 +252,6 @@ class Connection
         }
 
         return $result;
-    }
-
-    public function chain($carry, \Closure ...$callbacks)
-    {
-        return array_reduce(
-            $callbacks,
-            fn ($result, $cb) => false === $result ? false : $cb($this, $result),
-            $carry,
-        );
     }
 
     public function lastId(string $name = null): string|false
@@ -304,6 +325,11 @@ class Connection
         }
 
         return $text;
+    }
+
+    public function isDebug(): bool
+    {
+        return $this->options['debug'] ?? false;
     }
 
     public function getOption(string $name)

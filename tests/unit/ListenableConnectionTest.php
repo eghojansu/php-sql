@@ -37,7 +37,7 @@ class ListenableConnectionTest extends \Codeception\Test\Unit
     {
         $this->di = new Di();
         $this->log = new Log(array('directory' => TEST_TMP));
-        $this->dispatcher = new Dispatcher($this->di);
+        $this->dispatcher = $this->di->make(Dispatcher::class);
         $this->db = new ListenableConnection(
             $this->dispatcher,
             $this->log,

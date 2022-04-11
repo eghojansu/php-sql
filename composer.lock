@@ -8,16 +8,16 @@
     "packages": [
         {
             "name": "ekok/php-container",
-            "version": "v0.2.2",
+            "version": "v0.2.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/eghojansu/php-container.git",
-                "reference": "a2be435708d093921f182d8443def5dbf3fc7dc2"
+                "reference": "2746cf842bf0bbb1f404bc6cbb23dca12280cc60"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/eghojansu/php-container/zipball/a2be435708d093921f182d8443def5dbf3fc7dc2",
-                "reference": "a2be435708d093921f182d8443def5dbf3fc7dc2",
+                "url": "https://api.github.com/repos/eghojansu/php-container/zipball/2746cf842bf0bbb1f404bc6cbb23dca12280cc60",
+                "reference": "2746cf842bf0bbb1f404bc6cbb23dca12280cc60",
                 "shasum": ""
             },
             "require": {
@@ -48,22 +48,22 @@
             "description": "PHP Container",
             "support": {
                 "issues": "https://github.com/eghojansu/php-container/issues",
-                "source": "https://github.com/eghojansu/php-container/tree/v0.2.2"
+                "source": "https://github.com/eghojansu/php-container/tree/v0.2.4"
             },
-            "time": "2022-04-06T05:14:41+00:00"
+            "time": "2022-04-06T15:37:06+00:00"
         },
         {
             "name": "ekok/php-event-dispatcher",
-            "version": "v0.1.1",
+            "version": "v0.1.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/eghojansu/php-event-dispatcher.git",
-                "reference": "84eebcc02516408d5e5cfb95a3f28b065a02c889"
+                "reference": "cea3234488be75d7881fabab3b4bd82a17d2465a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/eghojansu/php-event-dispatcher/zipball/84eebcc02516408d5e5cfb95a3f28b065a02c889",
-                "reference": "84eebcc02516408d5e5cfb95a3f28b065a02c889",
+                "url": "https://api.github.com/repos/eghojansu/php-event-dispatcher/zipball/cea3234488be75d7881fabab3b4bd82a17d2465a",
+                "reference": "cea3234488be75d7881fabab3b4bd82a17d2465a",
                 "shasum": ""
             },
             "require": {
@@ -94,9 +94,9 @@
             "description": "PHP Event Dispatcher",
             "support": {
                 "issues": "https://github.com/eghojansu/php-event-dispatcher/issues",
-                "source": "https://github.com/eghojansu/php-event-dispatcher/tree/v0.1.1"
+                "source": "https://github.com/eghojansu/php-event-dispatcher/tree/v0.1.2"
             },
-            "time": "2022-04-06T04:39:23+00:00"
+            "time": "2022-04-06T07:04:18+00:00"
         },
         {
             "name": "ekok/php-logger",
@@ -145,16 +145,16 @@
         },
         {
             "name": "ekok/php-utils",
-            "version": "v0.2.0",
+            "version": "v0.2.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/eghojansu/php-utils.git",
-                "reference": "d2659acc18ebf4a68b11dba5ee4c7af935020011"
+                "reference": "02f3cdd8c798ae78643aa4ea21cbd0293b6f84d9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/eghojansu/php-utils/zipball/d2659acc18ebf4a68b11dba5ee4c7af935020011",
-                "reference": "d2659acc18ebf4a68b11dba5ee4c7af935020011",
+                "url": "https://api.github.com/repos/eghojansu/php-utils/zipball/02f3cdd8c798ae78643aa4ea21cbd0293b6f84d9",
+                "reference": "02f3cdd8c798ae78643aa4ea21cbd0293b6f84d9",
                 "shasum": ""
             },
             "require": {
@@ -184,9 +184,9 @@
             "description": "PHP Utilities",
             "support": {
                 "issues": "https://github.com/eghojansu/php-utils/issues",
-                "source": "https://github.com/eghojansu/php-utils/tree/v0.2.0"
+                "source": "https://github.com/eghojansu/php-utils/tree/v0.2.2"
             },
-            "time": "2022-04-06T01:49:59+00:00"
+            "time": "2022-04-11T01:38:57+00:00"
         }
     ],
     "packages-dev": [

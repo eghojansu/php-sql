@@ -96,16 +96,38 @@ SQL
 
     public function testInvalidQuery()
     {
+        $this->log->enable();
+
         $this->assertFalse($this->db->insert('demo', array('foo' => 'bar')));
+        $this->assertStringContainsString('General error: 1 table demo has no column named foo', $this->log->getLastLine());
+    }
+
+    public function testInvalidQueryOnDebug()
+    {
+        $this->log->enable();
+        $this->db->setOption('debug', true);
+
+        $this->assertFalse($this->db->insert('demo', array('foo' => 'bar')));
+        $this->assertStringContainsString('General error: 1 table demo has no column named foo', $this->log->getLastLine());
     }
 
     public function testTransaction()
     {
-        $actual = $this->db->transact(static function (Connection $db) {
-            return $db->exec("insert into demo (name) values ('foo')");
-        });
+        $expected = 3;
+        $actual = $this->db->transact(
+            0,
+            static fn (Connection $db, $result) => $result + $db->insert('demo', array(
+                'name' => 'foo',
+            )),
+            static fn (Connection $db, $result) => $result + $db->insert('demo', array(
+                'name' => 'bar',
+            )),
+            static fn (Connection $db, $result) => $result + $db->insert('demo', array(
+                'name' => 'baz',
+            )),
+        );
 
-        $this->assertEquals(1, $actual);
+        $this->assertSame($expected, $actual);
     }
 
     /** @dataProvider simplePaginateProvider */
@@ -218,6 +240,7 @@ SQL
             'raw_identifier' => null,
             'table_prefix' => null,
             'quotes' => null,
+            'debug' => false,
             'options' => null,
             'driver' => 'sqlite',
             'scripts' => array(),
@@ -302,25 +325,6 @@ SQL
         $this->assertSame('bar', $updated['name']);
     }
 
-    public function testChain()
-    {
-        $expected = 3;
-        $actual = $this->db->chain(
-            0,
-            static fn (Connection $db, $result) => $result + $db->insert('demo', array(
-                'name' => 'foo',
-            )),
-            static fn (Connection $db, $result) => $result + $db->insert('demo', array(
-                'name' => 'bar',
-            )),
-            static fn (Connection $db, $result) => $result + $db->insert('demo', array(
-                'name' => 'baz',
-            )),
-        );
-
-        $this->assertSame($expected, $actual);
-    }
-
     public function testInsert()
     {
         $expected = 1;
@@ -356,5 +360,20 @@ SQL
         $actual = $this->db->insert('demo', array('id' => 50, 'name' => 'row 50'), 'id');
 
         $this->assertEquals($expected, $actual);
+    }
+
+    public function testExec()
+    {
+        $this->assertSame(1, $this->db->exec("insert into demo (name) values ('foo')"));
+        $this->assertSame(1, $this->db->execRaw("insert into demo (name) values ('bar')"));
+    }
+
+    public function testLogging()
+    {
+        $this->log->enable();
+        $this->db->setOption('debug', true);
+
+        $this->assertSame(1, $this->db->exec("insert into demo (name) values ('foo')"));
+        $this->assertStringContainsString('Running query', $this->log->getLastLine());
     }
 }
